@@ -1,0 +1,55 @@
+/* styles.css */
+
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.background-container-welcome {
+  background-image: url("./img/sfondo_welcome.avif");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.background-container-login {
+  background-image: url("./img/sfondo_login.jpeg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.background-container-register {
+  background-image: url("./img/sfondo.jpg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 30% !important;
+}
+
+h2 {
+  color: #333;
+}
+
+p {
+  color: #666;
+}
+
+/* Aggiungi ulteriori stili condivisi o specifici se necessario */
