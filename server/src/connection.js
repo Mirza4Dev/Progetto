@@ -1,7 +1,7 @@
 // se c'è già stata una connessione
 //      allora riutilizziamo la connessione
 // altrimenti
-//   aa  creiamo una nuova connessione e ce la salviamo da parte
+//    creiamo una nuova connessione e ce la salviamo da parte
 const { MongoClient } = require("mongodb");
 const url = process.env.CONNECTION_STRING
 const client = new MongoClient(url);

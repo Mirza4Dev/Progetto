@@ -5,7 +5,7 @@ import LoginPage from './components/LoginPage';
 import Welcome from './components/Welcome';
 import HomeClient from './components/HomeClient'; // Aggiungi l'importazione
 import HomeRestaurant from './components/HomeRestaurant';
-a
+
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
