@@ -1,47 +1,104 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function HomeRestaurant({ user }) {
-  const [restaurantName, setRestaurantName] = useState('');
+const HomeRestaurant = () => {
+  const [newRestaurant, setNewRestaurant] = useState({
+    name: '',
+    description: '',
+  });
 
-  const handleAddRestaurant = async () => {
+  const [restaurants, setRestaurants] = useState([]);
+  const [reservations, setReservations] = useState([]);
+
+  useEffect(() => {
+    // Effettua la richiesta per ottenere la lista dei ristoranti e delle prenotazioni
+    const fetchData = async () => {
+      try {
+        const restaurantsResponse = await fetch('http://localhost:3000/restaurants');
+        const reservationsResponse = await fetch('http://localhost:3000/reservations');
+
+        if (!restaurantsResponse.ok || !reservationsResponse.ok) {
+          console.error('Errore durante il recupero dei dati.');
+          return;
+        }
+
+        const restaurantsData = await restaurantsResponse.json();
+        const reservationsData = await reservationsResponse.json();
+
+        setRestaurants(restaurantsData);
+        setReservations(reservationsData);
+      } catch (error) {
+        console.error('Errore durante il recupero dei dati:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Esegui solo al montaggio del componente
+
+  const handleNewRestaurantSubmit = async () => {
     try {
       const response = await fetch('http://localhost:3000/restaurants', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: restaurantName,
-          ownerId: user._id, // Assuming user object contains the ID of the logged-in user
-        }),
+        body: JSON.stringify(newRestaurant),
       });
 
       if (response.ok) {
-        console.log('Ristorante aggiunto con successo');
-        // Puoi fare qualcosa qui, come aggiornare lo stato per riflettere il nuovo ristorante
+        console.log('Ristorante aggiunto con successo!');
+
+        // Aggiorna la lista dei ristoranti dopo l'aggiunta di un nuovo ristorante
+        const updatedRestaurantsResponse = await fetch('http://localhost:3000/restaurants');
+        const updatedRestaurants = await updatedRestaurantsResponse.json();
+        setRestaurants(updatedRestaurants);
       } else {
-        console.error('Errore durante l\'aggiunta del ristorante');
+        const errorData = await response.json();
+        console.error('Errore durante l\'aggiunta del ristorante:', errorData.message || 'Errore sconosciuto');
       }
     } catch (error) {
       console.error('Errore durante la richiesta di aggiunta del ristorante:', error);
     }
   };
 
+  const handleLogout = () => {
+    // Rimuovi il token di accesso e altri dati di autenticazione da localStorage
+    localStorage.removeItem('access_token');
+
+    // Puoi anche eseguire altre azioni post-logout, ad esempio navigare a una nuova pagina
+  };
+
+
   return (
-    <div>
-      <h2>Benvenuto, {user.name}!</h2>
-      <h3>Inserisci Ristorante</h3>
-      <div>
-        <label htmlFor="restaurantName">Nome Ristorante:</label>
-        <input
-          type="text"
-          id="restaurantName"
-          value={restaurantName}
-          onChange={(e) => setRestaurantName(e.target.value)}
-        />
-        <button onClick={handleAddRestaurant}>Aggiungi Ristorante</button>
+    <div className="container mt-5">
+      <h2 className="mb-4">Gestione Ristorante</h2>
+
+      <div className="mb-3">
+        <label htmlFor="name" className="form-label">Nome Ristorante:</label>
+        <input type="text" className="form-control" id="name" name="name" onChange={(e) => setNewRestaurant({ ...newRestaurant, name: e.target.value })} />
       </div>
-      <h3>Gestione delle Prenotazioni</h3>
+      <div className="mb-3">
+        <label htmlFor="description" className="form-label">Descrizione:</label>
+        <textarea className="form-control" id="description" name="description" onChange={(e) => setNewRestaurant({ ...newRestaurant, description: e.target.value })}></textarea>
+      </div>
+      <button type="button" className="btn btn-primary" onClick={handleNewRestaurantSubmit}>Aggiungi Ristorante</button>
+
+      {/* Visualizza la lista dei ristoranti */}
+      <h2 className="mt-5 mb-4">Lista dei Ristoranti</h2>
+      <ul>
+        {restaurants.map((restaurant) => (
+          <li key={restaurant._id}>{restaurant.name} - {restaurant.description}</li>
+        ))}
+      </ul>
+
+      {/* Visualizza la lista delle prenotazioni */}
+      <h2 className="mt-5 mb-4">Lista delle Prenotazioni</h2>
+      <ul>
+        {reservations.map((reservation) => (
+          <li key={reservation._id}>{reservation.day} - {reservation.time} - {reservation.guests}</li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default HomeRestaurant;

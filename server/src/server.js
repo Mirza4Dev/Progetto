@@ -1,8 +1,10 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
-const { authenticate } = require('./persistance')
+const { authenticateLogin } = require('./persistance')
 const fs = require('fs').promises;
+const jwt = require('jsonwebtoken');
+
 
 const bodyparser = require('body-parser')
 app.use(bodyparser.json())
@@ -10,130 +12,100 @@ const cors = require('cors');
 app.use(cors());
 
 const selectData = require('./select-data')
-const insertUser = require('./insert')
+const insertDocument = require('./insert')
 const deleteData = require('./delete-data')
 const updateData = require('./update-data')
 
 
+//-------------------------GET
+
 app.get('/users', async (req, res) => {
-  try {
-    const users = await selectData('utenti');
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Errore durante il recupero degli utenti:', error.message);
-    res.status(500).json({ error: 'Errore durante il recupero degli utenti' });
-  }
+  const users = await selectData('utenti');
+  res.status(200).json(users);
 });
 
 app.get('/restaurants', async (req, res) => {
-  try {
-    const db = await connection();
-    const usersCollection = db.collection('utenti');
-    const restaurants = await usersCollection.find({ category: 'ristoratore' }).toArray();
-    res.status(200).json(restaurants);
-  } catch (error) {
-    console.error('Errore durante il recupero dei ristoranti:', error.message);
-    res.status(500).json({ error: 'Errore durante il recupero dei ristoranti' });
-  }
+  const restaurants = await selectData('ristoranti');
+  res.status(200).json(restaurants);
 });
+
+app.get('/reservations', async (req, res) => {
+  const reservations = await selectData('reservations');
+  res.status(200).json(reservations);
+});
+
+//----------------------------POST
+
+app.post('/login', authenticateLogin, (req, res) => {
+  // L'oggetto req ora contiene req.currentUser e req.token
+  res.status(200).json({ token: req.token, user: req.currentUser });
+});
+
+
+
+
+
+app.post('/restaurants', async (req, res) => {
+  const { name, description } = req.body;
+  await insertDocument('ristoranti', {
+    name,
+    description
+  });
+
+  res.status(201).json({ message: 'Ristorante aggiunto con successo' });
+
+});
+
 
 app.post('/register', async (req, res) => {
-  try {
-    const { name, email, password, category } = req.body;
+  const { name, email, password, category } = req.body;
 
-    // Esegui l'inserimento dei dati nel tuo database
-    await insertUser({ name, email, password, category });
-
+  // Esegui l'inserimento dei dati nel tuo database
+  const insertResult = await insertDocument('utenti', {
+    name,
+    email,
+    password,
+    category
+  });
+  // Verifica se l'inserimento è avvenuto con successo
+  if (insertResult) {
     // Rispondi con un messaggio di successo
     res.status(200).json({ message: 'Registrazione avvenuta con successo' });
-  } catch (error) {
-    console.error(error);
+  } else {
+    // Se l'inserimento non è avvenuto correttamente, rispondi con un errore
     res.status(500).json({ error: 'Errore durante la registrazione dell\'utente' });
   }
+
 });
 
-app.post('/login', authenticate, (req, res) => {
+
+app.post('/restaurants/:id/reservations', async (req, res) => {
   try {
-    // Se il middleware ha eseguito con successo l'autenticazione, puoi accedere all'utente attraverso req.user
-    res.status(200).json({ message: 'Accesso riuscito', user: { ...req.user, category: req.body.category } });
-  } catch (error) {
-    console.error(error);
-    // Modifica la risposta per gestire il caso in cui le credenziali non sono valide
-    res.status(401).json({ error: 'Credenziali non valide' });
-  }
-});
+    const id = req.params.id;
+    const reservation = req.body;
 
-app.get('/reservations', authenticate, async (req, res) => {
-  try {
-    const db = await connection();
-    const reservationsCollection = db.collection('prenotazioni');
+    // Stampare a console il corpo della richiesta
+    console.log('Request Body:', req.body);
 
-    // Ottieni tutte le prenotazioni per il ristoratore autenticato
-    const reservations = await reservationsCollection.find({ restaurantId: req.user._id }).toArray();
-    res.status(200).json(reservations);
-  } catch (error) {
-    console.error('Errore durante il recupero delle prenotazioni:', error.message);
-    res.status(500).json({ error: 'Errore durante il recupero delle prenotazioni' });
-  }
-});
+    const result = await selectData(id);
 
-// Route per confermare una prenotazione
-app.put('/reservations/:id/confirm', authenticate, async (req, res) => {
-  try {
-    const db = await connection();
-    const reservationsCollection = db.collection('prenotazioni');
-    const reservationId = req.params.id;
-
-    // Controlla se la prenotazione appartiene al ristoratore autenticato
-    const reservation = await reservationsCollection.findOne({
-      _id: new ObjectId(reservationId),
-      restaurantId: req.user._id,
-    });
-
-    if (reservation) {
-      // Esegui l'azione di conferma della prenotazione qui
-      await updateData('prenotazioni', { _id: new ObjectId(reservationId) }, { $set: { confermata: true } });
-
-      res.status(200).json({ message: 'Prenotazione confermata con successo' });
+    if (result) {
+      const response = await insertDocument("reservations", reservation);
+      res.json(response);
     } else {
-      // La prenotazione non appartiene al ristoratore autenticato
-      res.status(403).json({ error: 'Accesso negato. La prenotazione non appartiene al ristoratore' });
+      res.status(404).json({ error: true, msg: 'Id not found' });
     }
   } catch (error) {
-    console.error('Errore durante la conferma della prenotazione:', error.message);
-    res.status(500).json({ error: 'Errore durante la conferma della prenotazione' });
-  }
-});
-
-// Route per annullare una prenotazione
-app.delete('/reservations/:id', authenticate, async (req, res) => {
-  try {
-    const db = await connection();
-    const reservationsCollection = db.collection('prenotazioni');
-    const reservationId = req.params.id;
-
-    // Controlla se la prenotazione appartiene al ristoratore autenticato
-    const reservation = await reservationsCollection.findOne({
-      _id: new ObjectId(reservationId),
-      restaurantId: req.user._id,
-    });
-
-    if (reservation) {
-      // Esegui l'azione di annullamento della prenotazione qui
-
-      res.status(200).json({ message: 'Prenotazione annullata con successo' });
-    } else {
-      // La prenotazione non appartiene al ristoratore autenticato
-      res.status(403).json({ error: 'Accesso negato. La prenotazione non appartiene al ristoratore' });
-    }
-  } catch (error) {
-    console.error('Errore durante l\'annullamento della prenotazione:', error.message);
-    res.status(500).json({ error: 'Errore durante l\'annullamento della prenotazione' });
+    console.error('Internal Server Error:', error);
+    res.status(500).json({ error: true, msg: 'Internal Server Error' });
   }
 });
 
 
 
+
+
+//------------------------------LISTEN
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server running on port ${process.env.SERVER_PORT}`)

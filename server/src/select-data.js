@@ -1,15 +1,14 @@
 const { ObjectId } = require("mongodb");
-const connection = require('./connection')
+const connection = require('./connection');
 
-async function selectData(colName, id) {
-  // Reference the "people" collection in the specified database
-  let db = await connection()
+async function selectData(colName, query) {
+  // Reference the collection in the specified database
+  let db = await connection();
   let col = db.collection(colName);
 
-  // Find and return the document
-  const selectResult = id ? await col.findOne({ "_id": new ObjectId(id) }) :
-    await col.find({}).toArray()
-  return selectResult
+  // Find and return the document based on the provided query
+  const selectResult = query ? await col.findOne(query) : await col.find({}).toArray();
+  return selectResult;
 }
 
-module.exports = selectData
+module.exports = selectData;
