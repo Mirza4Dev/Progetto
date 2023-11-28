@@ -52,3 +52,11 @@ p {
 }
 
 /* Aggiungi ulteriori stili condivisi o specifici se necessario */
+.restaurant-item {
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.restaurant-item:hover {
+  background-color: #74aee9; /* Bootstrap's default hover color */
+}

@@ -1,15 +1,14 @@
+const { ObjectId } = require('mongodb');
+const connection = require('./connection');
 
-const connection = require('./connection')
-
-async function delData(colName, query) {
-  let db = await connection()
+async function deleteData(colName, id) {
+  let db = await connection();
   const col = db.collection(colName);
 
   // Delete the document into the specified collection        
-  const deleteResult = await col.deleteMany(query);
+  const deleteResult = await col.deleteOne({ _id: new ObjectId(id) });
   console.log('Deleted documents =>', deleteResult);
-  return deleteResult
+  return deleteResult;
 }
 
-
-module.exports = delData
+module.exports = deleteData;

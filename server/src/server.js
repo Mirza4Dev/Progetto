@@ -5,7 +5,6 @@ const { authenticateLogin } = require('./persistance')
 const fs = require('fs').promises;
 const jwt = require('jsonwebtoken');
 
-
 const bodyparser = require('body-parser')
 app.use(bodyparser.json())
 const cors = require('cors');
@@ -84,9 +83,6 @@ app.post('/restaurants/:id/reservations', async (req, res) => {
     const id = req.params.id;
     const reservation = req.body;
 
-    // Stampare a console il corpo della richiesta
-    console.log('Request Body:', req.body);
-
     const result = await selectData(id);
 
     if (result) {
@@ -102,6 +98,25 @@ app.post('/restaurants/:id/reservations', async (req, res) => {
 });
 
 
+//----------------DELETE
+
+app.delete('/reservations/:id', async (req, res) => {
+  const id = req.params.id;
+  console.log('ID ricevuto:', id);
+
+  try {
+    const result = await deleteData('reservations', id);
+
+    if (result.deletedCount > 0) {
+      res.status(200).json({ message: 'Prenotazione eliminata con successo' });
+    } else {
+      res.status(404).json({ error: true, msg: 'Prenotazione non trovata' });
+    }
+  } catch (error) {
+    console.error('Errore durante l\'eliminazione della prenotazione:', error);
+    res.status(500).json({ error: true, msg: 'Errore interno del server' });
+  }
+});
 
 
 

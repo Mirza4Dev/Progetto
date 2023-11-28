@@ -6,18 +6,15 @@ const HomeClient = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [user, setUser] = useState(null);
-  const [showReservationForm, setShowReservationForm] = useState(false);
   const [myReservations, setMyReservations] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Recupera le informazioni sull'utente dal localStorage
     const storedUser = JSON.parse(localStorage.getItem('user'));
     setUser(storedUser);
   }, []);
 
   useEffect(() => {
-    // Effetto per la fetch dei ristoranti
     const fetchRestaurants = async () => {
       try {
         const response = await fetch('http://localhost:3000/restaurants');
@@ -29,16 +26,12 @@ const HomeClient = () => {
         setRestaurants(data);
       } catch (error) {
         console.error('Errore durante la fetch dei ristoranti:', error);
-        // Gestisci l'errore in base alle tue esigenze
       }
     };
-
-    // Chiamata alla funzione per la fetch dei ristoranti
     fetchRestaurants();
   }, []);
 
   useEffect(() => {
-    // Effetto per la fetch delle prenotazioni dell'utente
     const fetchUserReservations = async () => {
       try {
         const response = await fetch('http://localhost:3000/reservations');
@@ -50,48 +43,34 @@ const HomeClient = () => {
         setMyReservations(data);
       } catch (error) {
         console.error('Errore durante la fetch delle prenotazioni utente:', error);
-        // Gestisci l'errore in base alle tue esigenze
       }
     };
-
-    // Chiamata alla funzione per la fetch delle prenotazioni utente
     fetchUserReservations();
-  }, [user]); // Riesegui l'effetto quando cambia l'utente
-
+  });
 
   const handleRestaurantSelection = (restaurant) => {
     setSelectedRestaurant(restaurant);
   };
 
+  const handleDeleteReservation = async (reservationId) => {
+    console.log('reservationId:', reservationId);
 
-  const handleReservationSubmit = async (reservationData) => {
-    try {
-      // Effettua la richiesta POST al tuo endpoint di prenotazione
-      const response = await fetch(`http://localhost:3000/api/restaurants/${selectedRestaurant._id}/reservations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Assicurati di includere il token nel caso di autenticazione
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(reservationData),
-      });
+    const response = await fetch(`http://localhost:3000/reservations/${reservationId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error('Errore durante la prenotazione');
-      }
+    if (response.ok) {
+      setMyReservations(myReservations.filter(reservation => reservation._id !== reservationId));
 
-      // Aggiorna la lista delle prenotazioni dell'utente con la nuova prenotazione
-      const newReservation = await response.json();
-      setMyReservations([...myReservations, newReservation]);
-
-      // Chiudi la finestra di prenotazione dopo una prenotazione riuscita
-      setShowReservationForm(false);
-
-    } catch (error) {
-      console.error('Errore durante la prenotazione:', error);
-      // Gestisci l'errore in base alle tue esigenze
+      alert('Prenotazione eliminata con successo!');
     }
+
+
+
   };
 
 
@@ -105,7 +84,7 @@ const HomeClient = () => {
   return (
     <div className="background-container-login">
       {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-light bg-light" >
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <a className="navbar-brand" href="/">
           <img src="/Progetto/front/src/img/logo.png" alt="Forketta Logo" width="30" height="30" className="d-inline-block align-top" />
           Forketta
@@ -135,7 +114,7 @@ const HomeClient = () => {
               {restaurants.map((restaurant) => (
                 <li
                   key={restaurant._id}
-                  className="list-group-item"
+                  className="list-group-item restaurant-item"
                   onClick={() => handleRestaurantSelection(restaurant)}
                 >
                   {restaurant.name}
@@ -149,7 +128,17 @@ const HomeClient = () => {
             <ul className="list-group">
               {myReservations.map((reservation) => (
                 <li key={reservation._id} className="list-group-item">
-                  Ristorante: {reservation.name}, Giorno: {reservation.day}, Ora: {reservation.time}, Ospiti: {reservation.guests}
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      Ristorante: {reservation.name}, Giorno: {reservation.day}, Ora: {reservation.time}, Ospiti: {reservation.guests}
+                    </div>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteReservation(reservation._id)}
+                    >
+                      Elimina
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -160,14 +149,6 @@ const HomeClient = () => {
         {selectedRestaurant && (
           <div>
             <Reservation selectedRestaurant={selectedRestaurant} user={user} />
-            {/* Mostra la finestra di prenotazione solo se showReservationForm è true */}
-            {showReservationForm && (
-              <Reservation
-                onReservationSubmit={handleReservationSubmit}
-                restaurantId={selectedRestaurant?._id}
-                user={user}
-              />
-            )}
           </div>
         )}
       </div>

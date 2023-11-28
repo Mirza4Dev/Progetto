@@ -48,21 +48,47 @@ const Reservation = ({ selectedRestaurant, user }) => {
   };
 
   return (
-    <div>
+    <div className="container mt-4">
       <h2>Prenota presso {selectedRestaurant.name}</h2>
-      <div>
-        <label htmlFor="day">Giorno:</label>
-        <input type="text" id="day" value={day} onChange={(e) => setDay(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="time">Ora:</label>
-        <input type="text" id="time" value={time} onChange={(e) => setTime(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="guests">Ospiti:</label>
-        <input type="text" id="guests" value={guests} onChange={(e) => setGuests(e.target.value)} />
-      </div>
-      <button onClick={onReservationSubmit}>Prenota</button>
+      <form>
+        <div className="form-group">
+          <label htmlFor="day">Giorno:</label>
+          <input
+            type="date"
+            id="day"
+            className="form-control"
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="time">Ora:</label>
+          <input
+            type="time"
+            id="time"
+            className="form-control"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="guests">Ospiti:</label>
+          <input
+            type="number"
+            id="guests"
+            className="form-control"
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+          />
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={onReservationSubmit}
+        >
+          Prenota
+        </button>
+      </form>
     </div>
   );
 };
