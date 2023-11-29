@@ -6,16 +6,17 @@ const authenticateLogin = async (req, res, next) => {
   const { email, password, selectedCategory } = req.body;
 
   try {
-    // Recupera l'utente corrente in base all'email
-    const user = await selectData('utenti', { email });
-    console.log(user)
+    // Recupera gli utenti corrispondenti all'email
+    const users = await selectData('utenti', { email });
 
-    if (!user) {
+    if (!users || users.length === 0) {
       return res.status(404).json({ message: 'Utente non trovato' });
     }
 
-    // Verifica se le credenziali dell'utente corrispondono a quelle fornite nella richiesta
-    if (email !== user.email || password !== user.password || selectedCategory !== user.category) {
+    // Trova il primo utente che corrisponde alle credenziali fornite
+    const user = users.find(u => u.email === email && u.password === password && u.category === selectedCategory);
+
+    if (!user) {
       return res.status(403).json({ message: 'Credenziali non valide' });
     }
 

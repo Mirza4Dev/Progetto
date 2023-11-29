@@ -14,6 +14,7 @@ const HomeClient = () => {
     setUser(storedUser);
   }, []);
 
+
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
@@ -34,19 +35,30 @@ const HomeClient = () => {
   useEffect(() => {
     const fetchUserReservations = async () => {
       try {
-        const response = await fetch('http://localhost:3000/reservations');
+        const response = await fetch(`http://localhost:3000/reservations/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
         if (!response.ok) {
-          throw new Error('Errore nella fetch delle prenotazioni utente');
+          throw new Error('Errore nella fetch delle prenotazioni dell\'utente');
         }
 
         const data = await response.json();
         setMyReservations(data);
       } catch (error) {
-        console.error('Errore durante la fetch delle prenotazioni utente:', error);
+        console.error('Errore durante la fetch delle prenotazioni dell\'utente:', error);
       }
     };
-    fetchUserReservations();
-  });
+
+    if (user) {
+      fetchUserReservations();
+    }
+  }, [user]);
+
+
+
 
   const handleRestaurantSelection = (restaurant) => {
     setSelectedRestaurant(restaurant);
@@ -128,17 +140,13 @@ const HomeClient = () => {
             <ul className="list-group">
               {myReservations.map((reservation) => (
                 <li key={reservation._id} className="list-group-item">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      Ristorante: {reservation.name}, Giorno: {reservation.day}, Ora: {reservation.time}, Ospiti: {reservation.guests}
-                    </div>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDeleteReservation(reservation._id)}
-                    >
-                      Elimina
-                    </button>
-                  </div>
+                  {`Ristorante: ${reservation.name}, Giorno: ${reservation.day}, Ora: ${reservation.time}`}
+                  <button
+                    className="btn btn-danger ml-2"
+                    onClick={() => handleDeleteReservation(reservation._id)}
+                  >
+                    Elimina
+                  </button>
                 </li>
               ))}
             </ul>
@@ -148,7 +156,7 @@ const HomeClient = () => {
         {/* Sezione per la visualizzazione della prenotazione selezionata */}
         {selectedRestaurant && (
           <div>
-            <Reservation selectedRestaurant={selectedRestaurant} user={user} />
+            <Reservation selectedRestaurant={selectedRestaurant} user={user} setMyReservations={setMyReservations} />
           </div>
         )}
       </div>

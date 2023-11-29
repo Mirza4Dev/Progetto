@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 
-const Reservation = ({ selectedRestaurant, user }) => {
+
+// TODO! far apparire la prenotazione nella lista 'le mie prenotazioni' appena il pulsante submit viene premuto
+
+
+const Reservation = ({ selectedRestaurant, user, setMyReservations }) => {
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('');
@@ -15,7 +19,7 @@ const Reservation = ({ selectedRestaurant, user }) => {
     // Crea un oggetto con i dati della prenotazione
     const reservation = {
       restaurant_Id: selectedRestaurant._id,
-      user_Id: user._id, // Utilizza il valore passato come prop
+      user_Id: user._id,
       name: selectedRestaurant.name,
       day,
       time,
@@ -38,7 +42,7 @@ const Reservation = ({ selectedRestaurant, user }) => {
         throw new Error('Errore durante la prenotazione');
       }
 
-      // Aggiorna lo stato o esegui altre azioni in base alla risposta del server
+
 
       alert('Prenotazione effettuata con successo!');
     } catch (error) {

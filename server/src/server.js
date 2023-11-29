@@ -23,6 +23,12 @@ app.get('/users', async (req, res) => {
   res.status(200).json(users);
 });
 
+// app.get('/users/:id/restaurants', async (req, res) => {
+//   const id = req.params.id;
+//   const restaurants = await selectData('ristoranti', { restaurant_Id: id });
+//   res.status(200).json(restaurants);
+// });
+
 app.get('/restaurants', async (req, res) => {
   const restaurants = await selectData('ristoranti');
   res.status(200).json(restaurants);
@@ -32,6 +38,23 @@ app.get('/reservations', async (req, res) => {
   const reservations = await selectData('reservations');
   res.status(200).json(reservations);
 });
+
+app.get('/reservations/user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  console.log(userId)
+  try {
+    // Usa il modulo selectData per ottenere le prenotazioni dell'utente
+    const userReservations = await selectData('reservations', { user_Id: userId });
+    console.log(userReservations)
+
+    res.json(userReservations);
+  } catch (error) {
+    console.error('Errore durante il recupero delle prenotazioni dell\'utente:', error);
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+
 
 //----------------------------POST
 
@@ -45,8 +68,9 @@ app.post('/login', authenticateLogin, (req, res) => {
 
 
 app.post('/restaurants', async (req, res) => {
-  const { name, description } = req.body;
+  const { restaurant_Id, name, description } = req.body;
   await insertDocument('ristoranti', {
+    restaurant_Id,
     name,
     description
   });
