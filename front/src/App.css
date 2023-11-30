@@ -35,7 +35,16 @@ body {
   justify-content: center;
   align-items: center;
 }
-
+.background-container-client {
+  background-image: url("./img/sfondo_login.jpeg");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 .container {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
@@ -51,12 +60,12 @@ p {
   color: #666;
 }
 
-/* Aggiungi ulteriori stili condivisi o specifici se necessario */
-.restaurant-item {
-  cursor: pointer;
-  transition: background-color 0.3s;
+.main {
+  gap: 100px;
 }
 
-.restaurant-item:hover {
-  background-color: #74aee9; /* Bootstrap's default hover color */
+.card.hover:hover {
+  background-color: #fa8c26c2;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }

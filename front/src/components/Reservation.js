@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 
-// TODO! far apparire la prenotazione nella lista 'le mie prenotazioni' appena il pulsante submit viene premuto
 
 
-const Reservation = ({ selectedRestaurant, user, setMyReservations }) => {
+
+const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations }) => {
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('');
@@ -42,6 +42,11 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations }) => {
         throw new Error('Errore durante la prenotazione');
       }
 
+      // Copia l'array corrente e aggiunge una nuova prenotazione
+      const newReservations = [...myReservations, reservation];
+
+      // Aggiorna lo stato delle prenotazioni
+      setMyReservations(newReservations);
 
 
       alert('Prenotazione effettuata con successo!');
@@ -52,48 +57,52 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations }) => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Prenota presso {selectedRestaurant.name}</h2>
-      <form>
-        <div className="form-group">
-          <label htmlFor="day">Giorno:</label>
-          <input
-            type="date"
-            id="day"
-            className="form-control"
-            value={day}
-            onChange={(e) => setDay(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="time">Ora:</label>
-          <input
-            type="time"
-            id="time"
-            className="form-control"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="guests">Ospiti:</label>
-          <input
-            type="number"
-            id="guests"
-            className="form-control"
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
-          />
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={onReservationSubmit}
-        >
-          Prenota
-        </button>
-      </form>
+    <div className="container mt-3">
+      <h2>Presso {selectedRestaurant.name}</h2>
+      <div className="mx-5">
+        <form className="form-inline">
+          <div className="form-group mb-3">
+            <label htmlFor="day" className="mr-2">Giorno:</label>
+            <input
+              type="date"
+              id="day"
+              className="form-control"
+              value={day}
+              onChange={(e) => setDay(e.target.value)}
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label htmlFor="time" className="mr-2">Ora:</label>
+            <input
+              type="time"
+              id="time"
+              className="form-control"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+          </div>
+          <div className="form-group mb-3">
+            <label htmlFor="guests" className="mr-2">Ospiti:</label>
+            <input
+              type="number"
+              id="guests"
+              className="form-control"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+            />
+          </div>
+          <button
+            type="button"
+            className="btn btn-primary mb-3"
+            onClick={onReservationSubmit}
+          >
+            Conferma
+          </button>
+        </form>
+      </div>
     </div>
+
+
   );
 };
 
