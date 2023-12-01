@@ -61,11 +61,40 @@ p {
 }
 
 .main {
-  gap: 100px;
+  gap: 30px;
 }
 
 .card.hover:hover {
   background-color: #fa8c26c2;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+/* Restaurant.css */
+.modal {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.text-rest {
+  color: whitesmoke;
 }

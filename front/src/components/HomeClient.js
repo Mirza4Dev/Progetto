@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Reservation from './Reservation';
 import { useNavigate } from 'react-router-dom';
 import Restaurant from './Restaurant';
 
@@ -121,6 +120,8 @@ const HomeClient = () => {
       </nav>
 
 
+      {/* TODO! fare la card in modo da avere foto ristorante in background, nome ristorante, Tipo di cucina  */}
+
 
       <div className="container mt-4">
         <div className="row main">
@@ -149,20 +150,19 @@ const HomeClient = () => {
             </div>
           </div>
 
-          {/* Sezione per la visualizzazione della prenotazione selezionata */}
-          <div className="col-md-4 d-flex align-items-center justify-content-center">
+          {/* Sezione per la visualizzazione del Restaurant */}
+          <div className="col d-flex align-items-center justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '30px', borderRadius: '50px', marginTop: '50px', marginRight: '30px' }}>
             {!selectedRestaurant && (
               <div className="text-center">
-                <p className="text-center lead mt-3 text-white" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '50px', borderRadius: '50px' }}>InForketta il ristorante e goditi una bella mangiata</p>
+                <p className="text-center lead mt-3 text-white" >InForketta il ristorante e goditi una bella mangiata</p>
               </div>
             )}
             {selectedRestaurant && (
-              <div>
-                <Reservation
-                  selectedRestaurant={selectedRestaurant}
+
+              <div >
+                <Restaurant selectedRestaurant={selectedRestaurant}
                   user={user}
-                  setMyReservations={setMyReservations}
-                  myReservations={myReservations}
+                  setMyReservations={setMyReservations} myReservations={myReservations}
                 />
               </div>
             )}
@@ -174,10 +174,7 @@ const HomeClient = () => {
 
 
 
-      <div className='container mt-4'>
-        <Restaurant
-        />
-      </div>
+
 
       {/* Sezione per la visualizzazione delle prenotazioni utente */}
       <div className="col-md-6">
@@ -185,13 +182,14 @@ const HomeClient = () => {
         <ul className="list-group">
           {myReservations.map((reservation) => (
             <li key={reservation._id} className="list-group-item">
-              {`Ristorante: ${reservation.name}, Giorno: ${reservation.day}, Ora: ${reservation.time}`}
               <button
-                className="btn btn-danger ml-2"
+                className="btn btn-danger me-2"
                 onClick={() => handleDeleteReservation(reservation._id)}
               >
-                Elimina
+                X
               </button>
+              {`Ristorante: ${reservation.name}, Giorno: ${reservation.day}, Ora: ${reservation.time}, N° Ospiti: ${reservation.guests}`}
+
             </li>
           ))}
         </ul>

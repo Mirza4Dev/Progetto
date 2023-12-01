@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 
 
-const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations }) => {
+const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations, closeReservationModal }) => {
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('');
@@ -47,9 +47,9 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
 
       // Aggiorna lo stato delle prenotazioni
       setMyReservations(newReservations);
-
-
-      alert('Prenotazione effettuata con successo!');
+      // Chiudi la finestra modale
+      closeReservationModal();
+      alert('Prenotazione aggiunta');
     } catch (error) {
       console.error('Errore durante la prenotazione:', error);
       alert('Errore durante la prenotazione. Si prega di riprovare.');
@@ -58,7 +58,6 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
 
   return (
     <div className="container mt-3">
-      <h2>Presso {selectedRestaurant.name}</h2>
       <div className="mx-5">
         <form className="form-inline">
           <div className="form-group mb-3">
