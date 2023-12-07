@@ -99,16 +99,23 @@ app.post('/restaurants/:id/reservations', async (req, res) => {
 });
 
 app.post('/reviews', async (req, res) => {
-  const { restaurant_Id, user_Id, userName, text } = req.body;
+  const { restaurant_Id, user_Id, userName, text, date, rating } = req.body;
   const newReview = {
     restaurant_Id,
     user_Id,
     userName,
     text,
+    date: new Date().toISOString(), // Puoi anche utilizzare la data inviata dalla richiesta, se necessario
+    rating,
   };
 
   const result = await insertDocument('reviews', newReview);
 
+  if (result) {
+    res.status(200).json({ message: 'Grazie per aver inserito la recensione' });
+  } else {
+    res.status(404).json({ error: true, msg: 'Id not found' });
+  }
 });
 
 //----------------DELETE
@@ -152,6 +159,21 @@ app.put('/reviews/:id', async (req, res) => {
   }
 
 });
+
+app.put('/reservations/:id', async (req, res) => {
+  const reservationId = req.params.id;
+  const { day, time, guests } = req.body;
+
+  const updatedData = { day, time, guests };
+  const result = await updateData('reservations', reservationId, updatedData); // Chiama il tuo modulo
+
+  if (result.modifiedCount > 0) {
+    res.status(200).json({ message: 'Prenotazione modificata con successo' });
+  } else {
+    res.status(404).json({ error: true, msg: 'Prenotazione non trovata' });
+  }
+});
+
 
 //------------------------------LISTEN
 

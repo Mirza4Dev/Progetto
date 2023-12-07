@@ -3,23 +3,19 @@ import Reservation from './Reservation';
 import Review from './Review';
 import EditReview from './EditReview';
 
-const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservations }) => {
+export default function Restaurant({ selectedRestaurant, user, setMyReservations, myReservations }) {
   const [showReservationModal, setShowReservationModal] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [editingReviewId, setEditingReviewId] = useState(null);
+  const [showEditReviewModal, setShowEditReviewModal] = useState(false);
 
 
-  const closeReviewForm = () => {
-    console.log('Chiamata a closeReviewForm');
-    setShowReviewForm(false);
-  };
 
 
-  useEffect(() => {
-    const fetchReviews = async () => {
+  useEffect(function () {
+    async function fetchReviews() {
       try {
-        // Recupera le recensioni dal backend per il ristorante corrente
         const response = await fetch(`http://localhost:3000/reviews/${selectedRestaurant._id}`);
         if (!response.ok) {
           throw new Error('Errore durante il recupero delle recensioni');
@@ -29,29 +25,30 @@ const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservation
         setReviews(fetchedReviews);
       } catch (error) {
         console.error('Errore durante il recupero delle recensioni:', error);
-        // Gestisci l'errore (ad esempio, mostra un messaggio all'utente)
       }
-    };
+    }
 
-    // Chiamata alla funzione per recuperare le recensioni quando il componente viene montato
     fetchReviews();
-  }, [selectedRestaurant._id, closeReviewForm]);
+  }, [selectedRestaurant._id, showReviewForm]);
 
-  const openReservationModal = () => {
+  function openReservationModal() {
     setShowReservationModal(true);
-  };
+  }
 
-  const closeReservationModal = () => {
+  function closeReservationModal() {
     setShowReservationModal(false);
-  };
+  }
 
-  const openReviewForm = () => {
+  function openReviewForm() {
     setShowReviewForm(true);
-  };
+  }
+  function closeReviewForm() {
+    setShowReviewForm(false);
+    setShowEditReviewModal(false);
+  }
 
-  const deleteReview = async (reviewId) => {
+  async function deleteReview(reviewId) {
     try {
-      // Effettua una richiesta al backend per eliminare la recensione
       const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
         method: 'DELETE',
       });
@@ -60,73 +57,92 @@ const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservation
         throw new Error('Errore durante l\'eliminazione della recensione');
       }
 
-      // Rimuovi la recensione dall'array reviews
       setReviews(reviews.filter((review) => review._id !== reviewId));
     } catch (error) {
       console.error('Errore durante l\'eliminazione della recensione:', error);
-      // Gestisci l'errore, ad esempio mostrando un messaggio all'utente
     }
-  };
-  const editReview = (reviewId) => {
+  }
+
+  function editReview(reviewId) {
     setEditingReviewId(reviewId);
-  };
+    setShowEditReviewModal(true);
+  }
 
-  const cancelEditReview = () => {
+
+  function cancelEditReview() {
     setEditingReviewId(null);
-  };
+    setShowEditReviewModal(false);
+  }
 
-  const handleEditReview = (reviewId, newText) => {
-    // Aggiungi la logica per inviare la richiesta di modifica al backend
-    console.log(`Modifica recensione ${reviewId} con il nuovo testo: ${newText}`);
 
-    // Dopo la modifica, reimposta l'ID della recensione corrente a null
-    cancelEditReview();
-  };
   return (
-    <div className="restaurant-container">
+    <div>
       {/* Sezione dati del ristorante */}
-
       <section className="restaurant-info">
-        <h2>Ristorante: {selectedRestaurant.name} <button className="btn btn-primary" onClick={openReservationModal}>
+        <h2>
+          Ristorante: {selectedRestaurant.name}{' '}
+        </h2>
+        <button className="btn btn-primary" onClick={openReservationModal}>
           Prenota il tuo tavolo!.. ORA
-        </button></h2>
-
+        </button>
         <img src="" alt="FotoRistorante" />
         <p className='text-rest'>{selectedRestaurant.description}</p>
-
       </section>
 
       {/* Sezione recensioni */}
       <section className="reviews-section">
-        <h2>Recensioni <button className="btn btn-primary" onClick={openReviewForm}>
-          Scrivi una recensione
-        </button></h2>
-        {/* Visualizza solo le recensioni relative al ristorante corrente */}
-        {reviews.map((review) => (
-          <div key={review._id}>
-            {editingReviewId === review._id ? (
+        <div className='"d-flex justify-content-between align-items-center"'>
+          <h2>
+            Recensioni
+          </h2>
+          <button className="btn btn-primary" onClick={openReviewForm}>
+            Scrivi una recensione
+          </button>
+        </div>
+        <div className="scrollbar" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+          {reviews
+            .sort((a, b) => new Date(b.date) - new Date(a.date)) // Ordina le recensioni per data decrescente
+            .map((review) => (
+              <div key={review._id} className="card mb-3">
+                <div className="card-body">
+                  {showEditReviewModal && editingReviewId === review._id ? (
+                    <div className="modal" style={{ display: 'block' }}>
+                      <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <h5 className="modal-title">Modifica Recensione</h5>
+                            <button type="button" className="btn-close" onClick={cancelEditReview}></button>
+                          </div>
+                          <div className="modal-body">
+                            <EditReview
+                              reviewId={editingReviewId}
+                              currentText={reviews.find((r) => r._id === editingReviewId)?.text}
+                              cancelEditReview={cancelEditReview}
+                              closeReviewForm={closeReviewForm}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="d-flex justify-content-between align-items-center">
+                      <p className='card-title'>
+                        <strong>{review.userName} il {new Date(review.date).toLocaleDateString('it-IT')}<br /> Valutazione: {review.rating}/5</strong>
+                      </p>
+                      {review.user_Id === user._id && (
+                        <div className="d-flex">
+                          <button className="btn btn-primary" onClick={() => editReview(review._id)}>Modifica</button>
+                          <button className="btn btn-danger me-2" onClick={() => deleteReview(review._id)}>Elimina</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-              <EditReview
-                reviewId={review._id}
-                currentText={review.text}
-                onEditReview={handleEditReview}
-                onCancelEdit={cancelEditReview}
-              />
-
-
-            ) : (
-              <div>
-                <p className='text-rest'>Recensione di: {review.userName} <br /> {review.text}</p>
-                {review.user_Id === user._id && (
-                  <div>
-                    <button onClick={() => deleteReview(review._id)}>Elimina</button>
-                    <button onClick={() => editReview(review._id)}>Modifica</button>
-                  </div>
-                )}
+                  <p className='card-text'>{review.text}</p>
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            ))}
+        </div>
 
         {showReviewForm && (
           <div className="modal" style={{ display: 'block' }}>
@@ -140,8 +156,6 @@ const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservation
                   <Review
                     selectedRestaurant={selectedRestaurant}
                     user={user}
-                    reviews={reviews}
-                    setReviews={setReviews}
                     closeReviewForm={closeReviewForm}
                   />
                 </div>
@@ -149,6 +163,7 @@ const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservation
             </div>
           </div>
         )}
+
       </section>
 
       {/* Sezione prenotazioni */}
@@ -177,6 +192,4 @@ const Restaurant = ({ selectedRestaurant, user, setMyReservations, myReservation
       </section>
     </div>
   );
-};
-
-export default Restaurant;
+}

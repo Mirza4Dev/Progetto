@@ -9,19 +9,7 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
 
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleLogin = async () => {
+  async function handleLogin() {
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -53,10 +41,7 @@ export default function LoginPage() {
       console.error('Errore durante il login:', error);
       setError('Errore durante il login');
     }
-  };
-
-
-
+  }
 
   return (
     <div className="background-container-login">
@@ -65,19 +50,19 @@ export default function LoginPage() {
         <form>
           <div className="mb-3">
             <label className="form-label">Email:</label>
-            <input type="email" className="form-control" id="email" name="email" value={email} onChange={handleEmailChange} />
+            <input type="email" className="form-control" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="mb-3">
             <label className="form-label">Password:</label>
-            <input type="password" className="form-control" id="password" name="password" value={password} onChange={handlePasswordChange} />
+            <input type="password" className="form-control" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           <div className="mb-3">
             <div className="btn-group" >
-              <input type="radio" className="btn-check" id="clienteRadio" checked={selectedCategory === 'cliente'} onChange={() => handleCategoryChange('cliente')} />
+              <input type="radio" className="btn-check" id="clienteRadio" checked={selectedCategory === 'cliente'} onChange={() => setSelectedCategory('cliente')} />
               <label className="btn btn-outline-primary" htmlFor="clienteRadio">Cliente</label>
 
-              <input type="radio" className="btn-check" id="ristoratoreRadio" checked={selectedCategory === 'ristoratore'} onChange={() => handleCategoryChange('ristoratore')} />
+              <input type="radio" className="btn-check" id="ristoratoreRadio" checked={selectedCategory === 'ristoratore'} onChange={() => setSelectedCategory('ristoratore')} />
               <label className="btn btn-outline-primary" htmlFor="ristoratoreRadio">Ristoratore</label>
             </div>
           </div>
@@ -90,5 +75,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-

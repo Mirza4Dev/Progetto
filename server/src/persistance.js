@@ -21,7 +21,7 @@ const authenticateLogin = async (req, res, next) => {
     }
 
     // Se le credenziali sono valide, crea un token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'default-secret-key', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
     // Aggiungi l'utente corrente e il token all'oggetto req
     req.currentUser = user;

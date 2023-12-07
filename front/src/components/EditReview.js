@@ -1,47 +1,35 @@
 import React, { useState } from 'react';
 
-const EditReview = ({ reviewId, currentText, onEditReview, onCancelEdit }) => {
+export default function EditReview({ reviewId, currentText, cancelEditReview, closeReviewForm }) {
   const [editedText, setEditedText] = useState(currentText);
 
-  const handleTextChange = (e) => {
-    setEditedText(e.target.value);
-  };
-
-  const handleEditReview = async () => {
+  async function handleEditReview() {
     try {
       const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: editedText }), // Assicurati che la chiave sia "text"
+        body: JSON.stringify({ text: editedText }),
       });
 
       if (response.ok) {
-        onEditReview(reviewId, editedText);
+        closeReviewForm();
       } else if (response.status === 404) {
         console.error('Recensione non trovata:', response.statusText);
       } else {
         console.error('Errore durante la modifica della recensione:', response.statusText);
       }
-
     } catch (error) {
       console.error('Errore durante la modifica della recensione:', error);
     }
-  };
-
-  const handleCancelEdit = () => {
-    onCancelEdit();
-  };
+  }
 
   return (
     <div>
-      <textarea value={editedText} onChange={handleTextChange} />
+      <textarea value={editedText} onChange={(e) => setEditedText(e.target.value)} />
       <button onClick={handleEditReview}>Conferma</button>
-      <button onClick={handleCancelEdit}>Annulla</button>
+      <button onClick={cancelEditReview}>Annulla</button>
     </div>
   );
-};
-
-export default EditReview;
-
+}

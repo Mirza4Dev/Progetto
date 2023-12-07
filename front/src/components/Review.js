@@ -1,52 +1,47 @@
+// Nel tuo componente Review.js
 import React, { useState } from 'react';
 
-const Review = ({ selectedRestaurant, user, closeReviewForm, setReviews, reviews }) => {
+export default function Review({
+  selectedRestaurant,
+  user,
+  closeReviewForm
+}) {
   const [reviewText, setReviewText] = useState('');
+  const [rating, setRating] = useState(1);
 
-  const handleReviewSubmit = async () => {
-    const review = {
+
+  async function handleReviewSubmit() {
+    const newReview = {
       restaurant_Id: selectedRestaurant._id,
       user_Id: user._id,
       userName: user.name,
       text: reviewText,
+      date: new Date().toISOString(),
+      rating: rating
+    };
+
+    const response = await fetch('http://localhost:3000/reviews', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(newReview),
+    });
+
+    if (response.ok) {
+      closeReviewForm()
+    } else {
+      console.error('Errore durante l\'invio della recensione:', response.statusText);
     }
-    console.log('Inizio handleReviewSubmit');
-    try {
-      // Invia la recensione al backend
-      const response = await fetch('http://localhost:3000/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(review),
-
-      });
-
-      if (!response.ok) {
-        throw new Error('Errore durante l\'invio della recensione');
-      } else {
-
-        alert('Recensione aggiunta');
-      }
-
-
-    } catch (error) {
-      console.error('Errore durante l\'invio della recensione:', error);
-      alert('Errore durante la recensione. Si prega di riprovare.');
-    }
-    console.log('Fine handleReviewSubmit');
-  };
+  }
 
   return (
     <div>
-      <textarea
-        value={reviewText}
-        onChange={(e) => setReviewText(e.target.value)}
-        placeholder="Inserisci la tua recensione..."
-      />
-      <button onClick={handleReviewSubmit}>Invia recensione</button>
+      <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+      <label>Rating: </label>
+      <input type="number" value={rating} onChange={(e) => setRating(Number(e.target.value))} min="0" max="5" />
+      <button onClick={handleReviewSubmit}>Invia Recensione</button>
     </div>
   );
-};
-
-export default Review;
+}

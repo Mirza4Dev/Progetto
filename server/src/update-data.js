@@ -22,7 +22,7 @@ async function updateData(colName, id, updatedData) {
 
     const updateResult = await col.updateOne(
       { _id: new ObjectId(id) },
-      { $set: { text: updatedData } } // Modifica questa riga
+      { $set: updatedData } // Utilizza l'oggetto updatedData direttamente
     );
 
     console.log('Updated documents =>', updateResult);

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 
 
-
-
-
 const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations, closeReservationModal }) => {
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');

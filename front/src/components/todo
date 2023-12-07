@@ -1,0 +1,17 @@
+troppi re-render nel caricamento recensioni
+
+quando modifico la recensione non aggiorna subito ok!--
+rimane la finestra aperta di modifica ( finestra che deve diventare come quella delle prenotazioni)
+
+rifare struttura db ristorante - foto |
+fare la card in modo da avere foto ristorante in background, nome ristorante, Tipo di cucina, valutazione stelle(maybe), posiz. geografica
+
+ok! nelle recensioni aggiungere data | valutazione stelle
+
+implementera la ricerca in modo da cercare in base al nome e al luogo
+
+tasto modifica per le prenotazioni e aggiungerele nella navbar sottoforma di tendina che scende
+
+il mio profilo deve incorporare il tasto logout, ed aggiungere componente modifica utente, dove ci sarà la possibilita di fare anche la cacellazione del user
+
+schermata registrazione fare iuscire messaggio di successo, e reindirizzamento alla homepage

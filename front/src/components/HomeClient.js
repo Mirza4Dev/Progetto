@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Restaurant from './Restaurant';
+import { NavDropdown } from 'react-bootstrap';
+import EditReservation from './EditReservation';
 
-const HomeClient = () => {
+
+export default function HomeClient() {
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
   const [user, setUser] = useState(null);
   const [myReservations, setMyReservations] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedReservationForEdit, setSelectedReservationForEdit] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useEffect(function () {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     setUser(storedUser);
   }, []);
 
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    async function fetchRestaurants() {
       try {
         const response = await fetch('http://localhost:3000/restaurants');
         if (!response.ok) {
@@ -28,45 +33,39 @@ const HomeClient = () => {
       } catch (error) {
         console.error('Errore durante la fetch dei ristoranti:', error);
       }
-    };
+    }
+
     fetchRestaurants();
   }, []);
 
   useEffect(() => {
-    const fetchUserReservations = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/reservations/user/${user._id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
+    async function fetchUserReservations() {
+      const response = await fetch(`http://localhost:3000/reservations/user/${user._id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      const data = await response.json();
+      setMyReservations(data);
 
-        if (!response.ok) {
-          throw new Error('Errore nella fetch delle prenotazioni dell\'utente');
-        }
-
-        const data = await response.json();
-        setMyReservations(data);
-      } catch (error) {
-        console.error('Errore durante la fetch delle prenotazioni dell\'utente:', error);
-      }
-    };
+    }
 
     if (user) {
       fetchUserReservations();
     }
-  }, [user]);
+  }, [user, showEditModal]);
 
-
-
-
-  const handleRestaurantSelection = (restaurant) => {
+  function handleRestaurantSelection(restaurant) {
     setSelectedRestaurant(restaurant);
+  }
+
+  const handleEditReservation = (reservation) => {
+    setSelectedReservationForEdit(reservation);
+    setShowEditModal(true);
   };
 
-  const handleDeleteReservation = async (reservationId) => {
-    console.log('reservationId:', reservationId);
 
+  async function handleDeleteReservation(reservationId) {
     const response = await fetch(`http://localhost:3000/reservations/${reservationId}`, {
       method: 'DELETE',
       headers: {
@@ -80,18 +79,16 @@ const HomeClient = () => {
 
       alert('Prenotazione eliminata con successo!');
     }
+  }
 
 
 
-  };
 
-
-  const handleLogout = () => {
+  function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
-  };
-
+  }
 
   return (
     <div className="background-container-client">
@@ -109,6 +106,46 @@ const HomeClient = () => {
           </ul>
         </div>
 
+
+        <NavDropdown title="Le mie prenotazioni" id="basic-nav-dropdown">
+          <NavDropdown.ItemText>
+            <h2 className="mb-4">Prenotazioni</h2>
+            <ul className="list-group overflow-auto">
+              {myReservations
+                .sort((a, b) => new Date(a.day) - new Date(b.day))
+                .map((reservation) => (
+                  <li key={reservation._id} className="list-group-item mb-3 d-flex flex-column">
+                    <div>
+                      <p className="mb-1"><strong>Ristorante:</strong> {reservation.name}</p>
+                      <p className="mb-1 me-2"><strong>Giorno:</strong> {reservation.day}</p>
+                      <p className="mb-1"><strong>Ora:</strong> {reservation.time}</p>
+                      <p><strong>Ospiti:</strong> {reservation.guests}</p>
+                    </div>
+                    <div className="mt-auto d-flex align-items-center">
+                      <button
+                        className="btn btn-danger me-2"
+                        onClick={() => handleDeleteReservation(reservation._id)}
+                      >
+                        Elimina
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => handleEditReservation(reservation)}
+                      >
+                        Modifica
+                      </button>
+                    </div>
+                  </li>
+                ))}
+            </ul>
+          </NavDropdown.ItemText>
+        </NavDropdown>
+
+
+
+
+
+
         <ul className="navbar-nav" style={{ marginRight: '15px' }}>
           <li className="nav-item">
             <a className="nav-link" href="/profile">Il Mio Profilo</a>
@@ -118,9 +155,6 @@ const HomeClient = () => {
           </li>
         </ul>
       </nav>
-
-
-      {/* TODO! fare la card in modo da avere foto ristorante in background, nome ristorante, Tipo di cucina  */}
 
 
       <div className="container mt-4">
@@ -176,29 +210,15 @@ const HomeClient = () => {
 
 
 
-      {/* Sezione per la visualizzazione delle prenotazioni utente */}
-      <div className="col-md-6">
-        <h2 className="mb-4">Le mie prenotazioni</h2>
-        <ul className="list-group">
-          {myReservations.map((reservation) => (
-            <li key={reservation._id} className="list-group-item">
-              <button
-                className="btn btn-danger me-2"
-                onClick={() => handleDeleteReservation(reservation._id)}
-              >
-                X
-              </button>
-              {`Ristorante: ${reservation.name}, Giorno: ${reservation.day}, Ora: ${reservation.time}, N° Ospiti: ${reservation.guests}`}
-
-            </li>
-          ))}
-        </ul>
-      </div>
 
 
+      {showEditModal && (
+        <EditReservation
+          reservation={selectedReservationForEdit}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
 
     </div>
   );
 };
-
-export default HomeClient;
