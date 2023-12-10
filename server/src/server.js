@@ -99,13 +99,13 @@ app.post('/restaurants/:id/reservations', async (req, res) => {
 });
 
 app.post('/reviews', async (req, res) => {
-  const { restaurant_Id, user_Id, userName, text, date, rating } = req.body;
+  const { restaurant_Id, user_Id, userName, text, rating } = req.body;
   const newReview = {
     restaurant_Id,
     user_Id,
     userName,
     text,
-    date: new Date().toISOString(), // Puoi anche utilizzare la data inviata dalla richiesta, se necessario
+    date: new Date().toISOString(),
     rating,
   };
 
@@ -147,10 +147,11 @@ app.delete('/reviews/:id', async (req, res) => {
 
 
 app.put('/reviews/:id', async (req, res) => {
+  console.log('Dati ricevuti dal frontend:', req.body);
   const reviewId = req.params.id;
-  const { text: editedText } = req.body;
+  const { editedText } = req.body;
 
-  const result = await updateData('reviews', reviewId, editedText);
+  const result = await updateData('reviews', reviewId, { text: editedText });
 
   if (result.modifiedCount > 0) {
     res.status(200).json({ message: 'Recensione modificata con successo' });

@@ -17,7 +17,7 @@ export default function HomeClient() {
   useEffect(function () {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     setUser(storedUser);
-  }, []);
+  }, []); // senza useeffect entra in loop.. informarsi
 
 
   useEffect(() => {
@@ -81,7 +81,11 @@ export default function HomeClient() {
     }
   }
 
-
+  function formatDate(dateString) {
+    const options = { day: 'numeric', month: 'numeric', year: 'numeric' };
+    const formattedDate = new Date(dateString).toLocaleDateString(undefined, options);
+    return formattedDate;
+  }
 
 
   function handleLogout() {
@@ -117,7 +121,7 @@ export default function HomeClient() {
                   <li key={reservation._id} className="list-group-item mb-3 d-flex flex-column">
                     <div>
                       <p className="mb-1"><strong>Ristorante:</strong> {reservation.name}</p>
-                      <p className="mb-1 me-2"><strong>Giorno:</strong> {reservation.day}</p>
+                      <p className="mb-1 me-2"><strong>Giorno:</strong> {formatDate(reservation.day)}</p>
                       <p className="mb-1"><strong>Ora:</strong> {reservation.time}</p>
                       <p><strong>Ospiti:</strong> {reservation.guests}</p>
                     </div>

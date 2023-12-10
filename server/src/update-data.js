@@ -19,7 +19,6 @@ async function updateData(colName, id, updatedData) {
   try {
     const db = await connection();
     const col = db.collection(colName);
-
     const updateResult = await col.updateOne(
       { _id: new ObjectId(id) },
       { $set: updatedData } // Utilizza l'oggetto updatedData direttamente

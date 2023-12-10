@@ -7,13 +7,14 @@ export default function EditReservation({ reservation, onClose }) {
 
   const handleEditReservation = async () => {
     try {
+      const reservationId = reservation._id
       const updatedData = {
         day: newDay,
         time: newTime,
         guests: newGuests,
       };
 
-      const response = await fetch(`http://localhost:3000/reservations/${reservation._id}`, {
+      const response = await fetch(`http://localhost:3000/reservations/${reservationId}`, {
 
         method: 'PUT',
         headers: {

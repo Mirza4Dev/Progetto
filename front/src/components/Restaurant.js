@@ -15,21 +15,15 @@ export default function Restaurant({ selectedRestaurant, user, setMyReservations
 
   useEffect(function () {
     async function fetchReviews() {
-      try {
-        const response = await fetch(`http://localhost:3000/reviews/${selectedRestaurant._id}`);
-        if (!response.ok) {
-          throw new Error('Errore durante il recupero delle recensioni');
-        }
-
-        const fetchedReviews = await response.json();
-        setReviews(fetchedReviews);
-      } catch (error) {
-        console.error('Errore durante il recupero delle recensioni:', error);
+      const response = await fetch(`http://localhost:3000/reviews/${selectedRestaurant._id}`);
+      if (!response.ok) {
+        throw new Error('Errore durante il recupero delle recensioni');
       }
+      const fetchedReviews = await response.json();
+      setReviews(fetchedReviews);
     }
-
     fetchReviews();
-  }, [selectedRestaurant._id, showReviewForm]);
+  }, [selectedRestaurant._id, showEditReviewModal]);
 
   function openReservationModal() {
     setShowReservationModal(true);

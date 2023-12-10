@@ -4,13 +4,14 @@ export default function EditReview({ reviewId, currentText, cancelEditReview, cl
   const [editedText, setEditedText] = useState(currentText);
 
   async function handleEditReview() {
+    console.log('editedText:', editedText);
     try {
       const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: editedText }),
+        body: JSON.stringify({ editedText }),
       });
 
       if (response.ok) {

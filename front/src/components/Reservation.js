@@ -7,13 +7,11 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
   const [guests, setGuests] = useState('');
 
   const onReservationSubmit = async () => {
-    // Verifica che tutti i campi siano compilati
     if (!day || !time || !guests) {
       alert('Completa tutti i campi della prenotazione.');
       return;
     }
 
-    // Crea un oggetto con i dati della prenotazione
     const reservation = {
       restaurant_Id: selectedRestaurant._id,
       user_Id: user._id,
@@ -24,12 +22,10 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
     };
 
     try {
-      // Effettua la richiesta POST al tuo endpoint di prenotazione
       const response = await fetch(`http://localhost:3000/restaurants/${selectedRestaurant._id}/reservations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Assicurati di includere il token nel caso di autenticazione
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(reservation),
@@ -39,12 +35,10 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
         throw new Error('Errore durante la prenotazione');
       }
 
-      // Copia l'array corrente e aggiunge una nuova prenotazione
       const newReservations = [...myReservations, reservation];
 
       // Aggiorna lo stato delle prenotazioni
       setMyReservations(newReservations);
-      // Chiudi la finestra modale
       closeReservationModal();
       alert('Prenotazione aggiunta');
     } catch (error) {
