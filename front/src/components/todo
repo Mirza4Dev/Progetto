@@ -1,12 +1,12 @@
-rifare struttura db ristorante - foto |
-fare la card in modo da avere foto ristorante in background, nome ristorante, Tipo di cucina, valutazione stelle(maybe), posiz. geografica
+rifare struttura db ristorante - valutazione stelle(maybe)
 
-ok! nelle recensioni aggiungere data | valutazione stelle
+
+implementare il css del componenete review.. fa cagare
 
 implementera la ricerca in modo da cercare in base al nome e al luogo
-
-tasto modifica per le prenotazioni e aggiungerele nella navbar sottoforma di tendina che scende
 
 il mio profilo deve incorporare il tasto logout, ed aggiungere componente modifica utente, dove ci sarà la possibilita di fare anche la cacellazione del user
 
 schermata registrazione fare iuscire messaggio di successo, e reindirizzamento alla homepage
+
+quando un utente non loggato entra fargli vedere i ristoranti senza possibilita di prenotare o commentare, magari far uscire pop up per farlo registrare

@@ -25,7 +25,7 @@ app.get('/users', async (req, res) => {
 
 
 app.get('/restaurants', async (req, res) => {
-  const restaurants = await selectData('ristoranti');
+  const restaurants = await selectData('restaurants');
   res.status(200).json(restaurants);
 });
 
@@ -57,11 +57,22 @@ app.post('/login', authenticateLogin, (req, res) => {
 });
 
 app.post('/restaurants', async (req, res) => {
-  const { restaurant_Id, name, description } = req.body;
-  await insertDocument('ristoranti', {
+  const { restaurant_Id, name, description, photos, type, price, position } = req.body;
+
+  const { cap, city, street } = position;
+
+  await insertDocument('restaurants', {
     restaurant_Id,
     name,
-    description
+    description,
+    photos,
+    type,
+    price,
+    position: {
+      cap,
+      city,
+      street
+    }
   });
   res.status(201).json({ message: 'Ristorante aggiunto con successo' });
 });

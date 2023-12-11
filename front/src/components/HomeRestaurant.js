@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-const HomeRestaurant = () => {
+export default function HomeRestaurant() {
   const [newRestaurant, setNewRestaurant] = useState({
     name: '',
     description: '',
+    photos: [],
+    type: '',
+    price: '',
+    position: {
+      cap: '',
+      city: '',
+      street: ''
+    }
   });
+  const [newPhoto, setNewPhoto] = useState('');
   const [restaurants, setRestaurants] = useState([]);
   const [user, setUser] = useState(null);
 
@@ -13,37 +22,57 @@ const HomeRestaurant = () => {
     setUser(storedUser);
   }, []);
 
-  const handleNewRestaurantSubmit = async () => {
+  const addPhoto = () => {
+    setNewRestaurant((prevRestaurant) => ({
+      ...prevRestaurant,
+      photos: [...prevRestaurant.photos, newPhoto]
+    }));
+    setNewPhoto('');
+  };
+
+  function handleNewRestaurantSubmit() {
     const restaurantData = {
       restaurant_Id: user._id,
-      ...newRestaurant
+      ...newRestaurant,
     };
-    try {
 
-      const response = await fetch('http://localhost:3000/restaurants', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(restaurantData),
+    fetch('http://localhost:3000/restaurants', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(restaurantData),
+    })
+      .then(response => {
+        if (response.status !== 201) {
+          throw new Error(`Errore durante l'inserimento del ristorante: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(() => {
+        setNewRestaurant((prevRestaurant) => ({
+          ...prevRestaurant,
+          name: '',
+          description: '',
+          photo: [],
+          type: '',
+          price: '',
+          position: {
+            cap: '',
+            city: '',
+            street: ''
+          },
+        }));
+
+        alert('Ristorante aggiunto con successo!');
+      })
+      .catch(error => {
+        console.error('Errore durante l\'inserimento del ristorante:', error.message);
+        alert('Errore durante l\'inserimento del ristorante. Si prega di riprovare.');
       });
+  }
 
-      if (!response.ok) {
-        throw new Error('Errore durante l\'inserimento del ristorante');
-      }
-
-      setNewRestaurant({
-        name: '',
-        description: '',
-      });
-
-      alert('Ristorante aggiunto con successo!');
-    } catch (error) {
-      console.error('Errore durante l\'inserimento del ristorante:', error);
-      alert('Errore durante l\'inserimento del ristorante. Si prega di riprovare.');
-    }
-  };
 
   useEffect(() => {
     const fetchUserRestaurants = async () => {
@@ -67,6 +96,8 @@ const HomeRestaurant = () => {
 
     fetchUserRestaurants();
   }, [user]);
+
+
   const handleLogout = () => {
     localStorage.removeItem('access_token');
   };
@@ -96,9 +127,7 @@ const HomeRestaurant = () => {
                 onChange={(e) => setNewRestaurant({ ...newRestaurant, description: e.target.value })}
               />
             </div>
-            <button type="button" className="btn btn-primary" onClick={handleNewRestaurantSubmit}>
-              Aggiungi Ristorante
-            </button>
+
           </form>
         </div>
         <div className="col-md-6">
@@ -112,6 +141,76 @@ const HomeRestaurant = () => {
           </ul>
         </div>
       </div>
+      <div className="mb-3">
+        <label htmlFor="type" className="form-label">Tipologia cucina</label>
+        <input
+          type="text"
+          className="form-control"
+          id="type"
+          value={newRestaurant.type}
+          onChange={(e) => setNewRestaurant({ ...newRestaurant, type: e.target.value })}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="price" className="form-label">Prezzo</label>
+        <input
+          type="text"
+          className="form-control"
+          id="price"
+          value={newRestaurant.price}
+          onChange={(e) => setNewRestaurant({ ...newRestaurant, price: e.target.value })}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="photo" className="form-label">Foto</label>
+        <input
+          type="text"
+          className="form-control"
+          id="photo"
+          value={newPhoto}
+          onChange={(e) => setNewPhoto(e.target.value)}
+        />
+        <button type="button" className="btn btn-secondary mt-2" onClick={addPhoto}>
+          Aggiungi Foto
+        </button>
+      </div>
+      <div className="mb-3">
+        <label htmlFor="position" className="form-label">Posizione</label>
+        <div className="mb-3">
+          <label htmlFor="cap" className="form-label">CAP</label>
+          <input
+            type="text"
+            className="form-control"
+            id="cap"
+            value={newRestaurant.position.cap}
+            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, cap: e.target.value } })}
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="city" className="form-label">Città</label>
+          <input
+            type="text"
+            className="form-control"
+            id="city"
+            value={newRestaurant.position.city}
+            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, city: e.target.value } })}
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="street" className="form-label">Via</label>
+          <input
+            type="text"
+            className="form-control"
+            id="street"
+            value={newRestaurant.position.street}
+            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, street: e.target.value } })}
+          />
+        </div>
+      </div>
+
+      <button type="button" className="btn btn-primary" onClick={handleNewRestaurantSubmit}>
+        Aggiungi Ristorante
+      </button>
       <div className="mt-3">
         <button className="btn btn-danger" onClick={handleLogout}>
           Logout
@@ -121,4 +220,3 @@ const HomeRestaurant = () => {
   );
 };
 
-export default HomeRestaurant;

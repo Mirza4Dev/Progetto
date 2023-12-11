@@ -175,13 +175,17 @@ export default function HomeClient() {
               {restaurants.map((restaurant) => (
                 <div key={restaurant._id} className="col mb-3">
                   <div
-                    className="card h-100 restaurant-card hover"
+                    className={`card h-100 restaurant-card ${selectedRestaurant === restaurant ? 'selected' : 'hover'}`}
                     onClick={() => handleRestaurantSelection(restaurant)}
+                    style={{ backgroundImage: `url(${restaurant.photos[0]})` }}
                   >
                     <div className="card-body">
-                      <h5 className="card-title">{restaurant.name}</h5>
-                      <p className="card-text">{restaurant.description}</p>
+                      <h4 className="card-title">{restaurant.name}</h4>
+                      <p className="card-text">{restaurant.type}</p>
+                      <p className="card-text">{restaurant.position.city}</p>
+                      <p className="card-text">Prezzo medio: ${restaurant.price}</p>
                     </div>
+
                   </div>
                 </div>
               ))}
@@ -189,7 +193,7 @@ export default function HomeClient() {
           </div>
 
           {/* Sezione per la visualizzazione del Restaurant */}
-          <div className="col d-flex align-items-center justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '30px', borderRadius: '50px', marginTop: '50px', marginRight: '30px' }}>
+          <div className="col d-flex align-items-center justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '30px', borderRadius: '10px', marginTop: '50px', marginRight: '30px' }}>
             {!selectedRestaurant && (
               <div className="text-center">
                 <p className="text-center lead mt-3 text-white" >InForketta il ristorante e goditi una bella mangiata</p>

@@ -16,6 +16,7 @@ export default function EditReview({ reviewId, currentText, cancelEditReview, cl
 
       if (response.ok) {
         closeReviewForm();
+        alert('Recensione modificata con successo!');
       } else if (response.status === 404) {
         console.error('Recensione non trovata:', response.statusText);
       } else {

@@ -5,9 +5,9 @@ async function insertDocument(colName, input) {
   const col = db.collection(colName);
 
   // Insert the document into the specified collection        
-  const p = await col.insertOne(input);
-  console.log(p)
-  return p
+  const doc = await col.insertOne(input);
+  console.log(doc)
+  return doc
 }
 
 module.exports = insertDocument

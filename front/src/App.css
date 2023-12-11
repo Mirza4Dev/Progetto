@@ -65,10 +65,11 @@ p {
 }
 
 .card.hover:hover {
-  background-color: #fa8c26c2;
   cursor: pointer;
   transition: background-color 0.3s;
+  transform: scale(1.1);
 }
+
 /* Restaurant.css */
 .modal {
   display: flex;
@@ -95,6 +96,16 @@ p {
   cursor: pointer;
 }
 
-.text-rest {
-  color: whitesmoke;
+.restaurant-card {
+  background-size: cover;
+  background-position: center;
+}
+
+.card-body .card-title,
+.card-text {
+  color: white;
+}
+.card-body {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px;
 }
