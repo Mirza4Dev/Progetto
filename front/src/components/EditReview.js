@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
 
-export default function EditReview({ reviewId, currentText, cancelEditReview, closeReviewForm }) {
+export default function EditReview({ reviewId, currentText, cancelEditReview, setShowEditReviewModal }) {
   const [editedText, setEditedText] = useState(currentText);
 
   async function handleEditReview() {
@@ -15,7 +16,7 @@ export default function EditReview({ reviewId, currentText, cancelEditReview, cl
       });
 
       if (response.ok) {
-        closeReviewForm();
+        setShowEditReviewModal(false);
         alert('Recensione modificata con successo!');
       } else if (response.status === 404) {
         console.error('Recensione non trovata:', response.statusText);
@@ -28,10 +29,18 @@ export default function EditReview({ reviewId, currentText, cancelEditReview, cl
   }
 
   return (
-    <div>
-      <textarea value={editedText} onChange={(e) => setEditedText(e.target.value)} />
-      <button onClick={handleEditReview}>Conferma</button>
-      <button onClick={cancelEditReview}>Annulla</button>
-    </div>
+    <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Modifica Recensione</Form.Label>
+        <Form.Control as="textarea" value={editedText} onChange={(e) => setEditedText(e.target.value)} />
+      </Form.Group>
+
+      <Button variant="primary" onClick={handleEditReview}>
+        Conferma
+      </Button>
+      <Button variant="secondary" onClick={cancelEditReview}>
+        Annulla
+      </Button>
+    </Form>
   );
 }

@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import RegisterPage from './components/RegisterPage';
 import LoginPage from './components/LoginPage';
 import Welcome from './components/Welcome';
-import HomeClient from './components/HomeClient'; // Aggiungi l'importazione
+import HomeClient from './components/HomeClient';
 import HomeRestaurant from './components/HomeRestaurant';
 
 import './App.css';

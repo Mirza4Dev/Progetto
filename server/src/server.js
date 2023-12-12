@@ -177,8 +177,7 @@ app.put('/reservations/:id', async (req, res) => {
   const { day, time, guests } = req.body;
 
   const updatedData = { day, time, guests };
-  const result = await updateData('reservations', reservationId, updatedData); // Chiama il tuo modulo
-
+  const result = await updateData('reservations', reservationId, updatedData);
   if (result.modifiedCount > 0) {
     res.status(200).json({ message: 'Prenotazione modificata con successo' });
   } else {

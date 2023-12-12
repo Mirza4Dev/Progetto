@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function HomeRestaurant() {
   const [newRestaurant, setNewRestaurant] = useState({
@@ -16,6 +17,7 @@ export default function HomeRestaurant() {
   const [newPhoto, setNewPhoto] = useState('');
   const [restaurants, setRestaurants] = useState([]);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -98,9 +100,11 @@ export default function HomeRestaurant() {
   }, [user]);
 
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-  };
+  function handleLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  }
 
   return (
     <div className="container mt-5">

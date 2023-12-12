@@ -60,52 +60,44 @@ p {
   color: #666;
 }
 
-.main {
-  gap: 30px;
+/* Restaurant.css */
+
+.card-title,
+.card-text {
+  color: black;
+}
+.card-body {
+  background-color: whitesmoke;
+  padding: 15px;
 }
 
-.card.hover:hover {
+.dropdown-menu-scrollable {
+  max-height: 500px;
+  overflow-y: auto;
+}
+.restaurant-card {
+  transition: transform 0.3s;
   cursor: pointer;
-  transition: background-color 0.3s;
+}
+
+.restaurant-card:hover {
   transform: scale(1.1);
 }
 
-/* Restaurant.css */
-.modal {
+.three-columns-grid {
   display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  flex-wrap: wrap;
+}
+.three-columns-grid .col {
+  flex: 0 0 33.33%;
+  max-width: 33.33%;
+  padding-right: 10px;
 }
 
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 10px;
+.imgCard {
+  height: 120px;
 }
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
-
-.restaurant-card {
-  background-size: cover;
-  background-position: center;
-}
-
-.card-body .card-title,
-.card-text {
-  color: white;
-}
-.card-body {
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 15px;
+.scrollbar-review {
+  max-height: 170px;
+  overflow-y: auto;
 }

@@ -1,9 +1,11 @@
 rifare struttura db ristorante - valutazione stelle(maybe)
 
 
-implementare il css del componenete review.. fa cagare
+refactor delle funzioni con un setqualcosa singolo
 
-implementera la ricerca in modo da cercare in base al nome e al luogo
+far uscire accanto a http://localhost:3001/home-client /il nome ristorante o id
+
+bottone menu che fa uscire una finestra con il menu
 
 il mio profilo deve incorporare il tasto logout, ed aggiungere componente modifica utente, dove ci sarà la possibilita di fare anche la cacellazione del user
 

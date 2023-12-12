@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
 
 export default function Review({
   selectedRestaurant,
@@ -36,11 +37,20 @@ export default function Review({
   }
 
   return (
-    <div>
-      <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-      <label>Rating: </label>
-      <input type="number" value={rating} onChange={(e) => setRating(Number(e.target.value))} min="0" max="5" />
-      <button onClick={handleReviewSubmit}>Invia Recensione</button>
-    </div>
+    <Form>
+      <Form.Group className="mb-3">
+        <Form.Label>Recensione</Form.Label>
+        <Form.Control as="textarea" value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Rating</Form.Label>
+        <Form.Control type="number" value={rating} onChange={(e) => setRating(Number(e.target.value))} min="0" max="5" />
+      </Form.Group>
+
+      <Button variant="primary" onClick={handleReviewSubmit}>
+        Invia Recensione
+      </Button>
+    </Form>
   );
 }

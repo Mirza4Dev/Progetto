@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
 
 
-const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations, closeReservationModal }) => {
+const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations, setShowReservationModal }) => {
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');
   const [guests, setGuests] = useState('');
@@ -39,7 +40,7 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
 
       // Aggiorna lo stato delle prenotazioni
       setMyReservations(newReservations);
-      closeReservationModal();
+      setShowReservationModal();
       alert('Prenotazione aggiunta');
     } catch (error) {
       console.error('Errore durante la prenotazione:', error);
@@ -50,50 +51,46 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
   return (
     <div className="container mt-3">
       <div className="mx-5">
-        <form className="form-inline">
-          <div className="form-group mb-3">
-            <label htmlFor="day" className="mr-2">Giorno:</label>
-            <input
+        <Form className="form-inline">
+          <Form.Group className="mb-3">
+            <Form.Label htmlFor="day" className="mr-2">Giorno:</Form.Label>
+            <Form.Control
               type="date"
               id="day"
-              className="form-control"
               value={day}
               onChange={(e) => setDay(e.target.value)}
             />
-          </div>
-          <div className="form-group mb-3">
-            <label htmlFor="time" className="mr-2">Ora:</label>
-            <input
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label htmlFor="time" className="mr-2">Ora:</Form.Label>
+            <Form.Control
               type="time"
               id="time"
-              className="form-control"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
-          </div>
-          <div className="form-group mb-3">
-            <label htmlFor="guests" className="mr-2">Ospiti:</label>
-            <input
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label htmlFor="guests" className="mr-2">Ospiti:</Form.Label>
+            <Form.Control
               type="number"
               id="guests"
-              className="form-control"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
             />
-          </div>
-          <button
+          </Form.Group>
+          <Button
             type="button"
-            className="btn btn-primary mb-3"
+            variant="primary"
+            className="mb-3"
             onClick={onReservationSubmit}
           >
             Conferma
-          </button>
-        </form>
+          </Button>
+        </Form>
       </div>
     </div>
-
-
   );
-};
+}
 
 export default Reservation;
