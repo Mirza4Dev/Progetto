@@ -6,25 +6,21 @@ export default function EditReview({ reviewId, currentText, cancelEditReview, se
 
   async function handleEditReview() {
     console.log('editedText:', editedText);
-    try {
-      const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ editedText }),
-      });
+    const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ editedText }),
+    });
 
-      if (response.ok) {
-        setShowEditReviewModal(false);
-        alert('Recensione modificata con successo!');
-      } else if (response.status === 404) {
-        console.error('Recensione non trovata:', response.statusText);
-      } else {
-        console.error('Errore durante la modifica della recensione:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Errore durante la modifica della recensione:', error);
+    if (response.ok) {
+      setShowEditReviewModal(false);
+      alert('Recensione modificata con successo!');
+    } else if (response.status === 404) {
+      console.error('Recensione non trovata:', response.statusText);
+    } else {
+      console.error('Errore durante la modifica della recensione:', response.statusText);
     }
   }
 

@@ -78,12 +78,16 @@ p {
 .restaurant-card {
   transition: transform 0.3s;
   cursor: pointer;
+  height: 300px;
 }
 
 .restaurant-card:hover {
   transform: scale(1.1);
 }
-
+.restaurant-card.selected {
+  transform: scale(1.1);
+  border: 2px solid #007bff;
+}
 .three-columns-grid {
   display: flex;
   flex-wrap: wrap;
@@ -92,6 +96,7 @@ p {
   flex: 0 0 33.33%;
   max-width: 33.33%;
   padding-right: 10px;
+  padding-left: 10px;
 }
 
 .imgCard {
@@ -100,4 +105,22 @@ p {
 .scrollbar-review {
   max-height: 170px;
   overflow-y: auto;
+}
+.unclickable {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.unclickable:hover {
+  background-color: initial;
+}
+
+.w-100 {
+  height: 170px;
+}
+.restaurant-info {
+  height: 340px;
+}
+.reviews-section {
+  height: 260px;
 }

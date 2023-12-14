@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Form, Button, Container } from 'react-bootstrap';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,68 +11,74 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   async function handleLogin() {
-    try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, selectedCategory }),
-      });
+    const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password, selectedCategory }),
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message);
-        return;
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      setError(errorData.message);
+      return;
+    }
 
-      const { token, user } = await response.json();
+    const { token, user } = await response.json();
 
-      // Salva il token e le informazioni sull'utente nel localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(user));
 
-      // Esegui il reindirizzamento in base alla categoria
-      if (user.category === 'cliente') {
-        navigate('/home-client');
-      } else if (user.category === 'ristoratore') {
-        navigate('/home-restaurant');
-      }
-    } catch (error) {
-      console.error('Errore durante il login:', error);
-      setError('Errore durante il login');
+    if (user.category === 'cliente') {
+      navigate('/home-client');
+    } else if (user.category === 'ristoratore') {
+      navigate('/home-restaurant');
     }
   }
 
   return (
-    <div className="background-container-login">
-      <div className="container p-5">
+    <Container fluid className="background-container-login">
+      <Container className="p-5">
         <h2 className="mb-4">Accesso</h2>
-        <form>
-          <div className="mb-3">
-            <label className="form-label">Email:</label>
-            <input type="email" className="form-control" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Password:</label>
-            <input type="password" className="form-control" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Email:</Form.Label>
+            <Form.Control type="email" id="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password:</Form.Label>
+            <Form.Control type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </Form.Group>
 
-          <div className="mb-3">
-            <div className="btn-group" >
-              <input type="radio" className="btn-check" id="clienteRadio" checked={selectedCategory === 'cliente'} onChange={() => setSelectedCategory('cliente')} />
-              <label className="btn btn-outline-primary" htmlFor="clienteRadio">Cliente</label>
+          <Form.Group className="mb-3">
+            <Form.Switch
+              type="radio"
+              id="clienteRadio"
+              label="Cliente"
+              checked={selectedCategory === 'cliente'}
+              onChange={() => setSelectedCategory('cliente')}
+            />
+            <Form.Switch
+              type="radio"
+              id="ristoratoreRadio"
+              label="Ristoratore"
+              checked={selectedCategory === 'ristoratore'}
+              onChange={() => setSelectedCategory('ristoratore')}
+            />
+          </Form.Group>
 
-              <input type="radio" className="btn-check" id="ristoratoreRadio" checked={selectedCategory === 'ristoratore'} onChange={() => setSelectedCategory('ristoratore')} />
-              <label className="btn btn-outline-primary" htmlFor="ristoratoreRadio">Ristoratore</label>
-            </div>
-          </div>
+          <Button variant="primary" onClick={handleLogin}>
+            Accedi
+          </Button>
 
-          <button type="button" className="btn btn-primary" onClick={handleLogin}>Accedi</button>
           {error && <p className="text-danger mt-2">{error}</p>}
-        </form>
-        <p className="mt-3">Non hai ancora un account? <Link to="/register">Registrati qui</Link></p>
-      </div>
-    </div>
+        </Form>
+
+        <p className="mt-3">
+          Non hai ancora un account? <Link to="/register">Registrati qui</Link>
+        </p>
+      </Container>
+    </Container>
   );
 }

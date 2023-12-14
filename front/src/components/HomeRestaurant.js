@@ -12,10 +12,12 @@ export default function HomeRestaurant() {
       cap: '',
       city: '',
       street: ''
-    }
+    },
+    menu: {}
   });
   const [newPhoto, setNewPhoto] = useState('');
-  const [restaurants, setRestaurants] = useState([]);
+  const [dishName, setDishName] = useState('');
+  const [dishPrice, setDishPrice] = useState('');
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -24,15 +26,9 @@ export default function HomeRestaurant() {
     setUser(storedUser);
   }, []);
 
-  const addPhoto = () => {
-    setNewRestaurant((prevRestaurant) => ({
-      ...prevRestaurant,
-      photos: [...prevRestaurant.photos, newPhoto]
-    }));
-    setNewPhoto('');
-  };
 
   function handleNewRestaurantSubmit() {
+
     const restaurantData = {
       restaurant_Id: user._id,
       ...newRestaurant,
@@ -65,7 +61,10 @@ export default function HomeRestaurant() {
             city: '',
             street: ''
           },
+          menu: {}
         }));
+        setDishName('');
+        setDishPrice('');
 
         alert('Ristorante aggiunto con successo!');
       })
@@ -75,35 +74,20 @@ export default function HomeRestaurant() {
       });
   }
 
-
-  useEffect(() => {
-    const fetchUserRestaurants = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/users/${user._id}/restaurants`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Errore durante il recupero dei ristoranti dell\'utente');
-        }
-
-        const data = await response.json();
-        setRestaurants(data);
-      } catch (error) {
-        console.error('Errore durante il recupero dei ristoranti dell\'utente:', error);
-      }
-    };
-
-    fetchUserRestaurants();
-  }, [user]);
-
-
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+  }
+
+  function addPhoto() {
+    if (newPhoto.trim()) {
+      setNewRestaurant((prevRestaurant) => ({
+        ...prevRestaurant,
+        photos: [...prevRestaurant.photos, newPhoto.trim()]
+      }));
+      setNewPhoto('');
+    }
   }
 
   return (
@@ -134,16 +118,6 @@ export default function HomeRestaurant() {
 
           </form>
         </div>
-        <div className="col-md-6">
-          <h2 className="mb-4">Lista dei Ristoranti</h2>
-          <ul className="list-group">
-            {restaurants.map((restaurant) => (
-              <li key={restaurant._id} className="list-group-item">
-                {restaurant.name}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
       <div className="mb-3">
         <label htmlFor="type" className="form-label">Tipologia cucina</label>
@@ -166,11 +140,11 @@ export default function HomeRestaurant() {
         />
       </div>
       <div className="mb-3">
-        <label htmlFor="photo" className="form-label">Foto</label>
+        <label htmlFor="newPhoto" className="form-label">Foto</label>
         <input
           type="text"
           className="form-control"
-          id="photo"
+          id="newPhoto"
           value={newPhoto}
           onChange={(e) => setNewPhoto(e.target.value)}
         />
@@ -178,6 +152,16 @@ export default function HomeRestaurant() {
           Aggiungi Foto
         </button>
       </div>
+
+      <div className="mt-3">
+        <h4>Lista Foto</h4>
+        <ul>
+          {newRestaurant.photos.map((photo, index) => (
+            <li key={index}>{photo}</li>
+          ))}
+        </ul>
+      </div>
+
       <div className="mb-3">
         <label htmlFor="position" className="form-label">Posizione</label>
         <div className="mb-3">
@@ -211,6 +195,53 @@ export default function HomeRestaurant() {
           />
         </div>
       </div>
+      <div className="mb-3">
+        <label htmlFor="dishName" className="form-label">Nome Piatto</label>
+        <input
+          type="text"
+          className="form-control"
+          id="dishName"
+          value={dishName}
+          onChange={(e) => setDishName(e.target.value)}
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="dishPrice" className="form-label">Prezzo</label>
+        <input
+          type="text"
+          className="form-control"
+          id="dishPrice"
+          value={dishPrice}
+          onChange={(e) => setDishPrice(e.target.value)}
+        />
+      </div>
+      <div className="mt-3">
+        <h4>Menu</h4>
+        <ul>
+          {Object.keys(newRestaurant.menu).map((dish) => (
+            <li key={dish}>{dish}: {newRestaurant.menu[dish]}</li>
+          ))}
+
+        </ul>
+      </div>
+
+      <button
+        type="button"
+        className="btn btn-secondary mt-2"
+        onClick={() => {
+          if (dishName && dishPrice) {
+            setNewRestaurant((prevRestaurant) => ({
+              ...prevRestaurant,
+              menu: { ...prevRestaurant.menu, [dishName]: dishPrice }
+            }));
+            setDishName('');
+            setDishPrice('');
+          }
+        }}
+      >
+        Aggiungi Piatto
+      </button>
+      <br /><br />
 
       <button type="button" className="btn btn-primary" onClick={handleNewRestaurantSubmit}>
         Aggiungi Ristorante

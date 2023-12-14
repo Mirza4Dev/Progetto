@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ export default function RegisterPage() {
     password: '',
   });
   const [selectedCategory, setSelectedCategory] = useState('cliente');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const navigate = useNavigate()
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -20,8 +23,13 @@ export default function RegisterPage() {
     });
   };
 
-  const handleRegister = () => {
-    fetch('http://localhost:3000/register', {
+  const handleRegister = async () => {
+    if (!formData.name || !formData.email || !formData.password) {
+      alert('Compila tutti i campi');
+      return;
+    }
+
+    const response = await fetch('http://localhost:3000/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,55 +40,77 @@ export default function RegisterPage() {
         password: formData.password,
         category: selectedCategory,
       }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        // Handle the success data (e.g., show success message)
-        console.log('Registration successful:', data);
-      })
-      .catch(error => {
-        // Handle errors (e.g., show error message)
-        console.error('Error during registration:', error.message);
-      });
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Registrazione avvenuta con successo:', data);
+      setRegistrationSuccess(true);
+
+    }
   };
+  useEffect(() => {
+    if (registrationSuccess) {
+      const timeoutId = setTimeout(() => {
+        setRegistrationSuccess(false);
+        navigate('/login');
+      }, 4000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [registrationSuccess, navigate]);
+
 
   return (
-    <div className="background-container-register">
-      <div className="container p-5">
+    <Container fluid className="background-container-register">
+      <Container className="p-5">
         <h2 className="mb-4">Registrazione</h2>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="name" className="form-label">Nome:</label>
-            <input type="text" className="form-control" id="name" name="name" onChange={handleInputChange} />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email:</label>
-            <input type="email" className="form-control" id="email" name="email" onChange={handleInputChange} />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">Password:</label>
-            <input type="password" className="form-control" id="password" name="password" onChange={handleInputChange} />
-          </div>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Nome:</Form.Label>
+            <Form.Control type="text" id="name" name="name" onChange={handleInputChange} />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Email:</Form.Label>
+            <Form.Control type="email" id="email" name="email" onChange={handleInputChange} />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Password:</Form.Label>
+            <Form.Control type="password" id="password" name="password" onChange={handleInputChange} />
+          </Form.Group>
 
-          <div className="mb-3">
-            <div className="btn-group" role="group">
-              <input type="radio" className="btn-check" id="clienteRadio" autoComplete="off" checked={selectedCategory === 'cliente'} onChange={() => handleCategoryChange('cliente')} />
-              <label className="btn btn-outline-primary" htmlFor="clienteRadio">Cliente</label>
+          <Form.Group className="mb-3">
+            <Form.Switch
+              type="radio"
+              id="clienteRadio"
+              label="Cliente"
+              checked={selectedCategory === 'cliente'}
+              onChange={() => handleCategoryChange('cliente')}
+            />
+            <Form.Switch
+              type="radio"
+              id="ristoratoreRadio"
+              label="Ristoratore"
+              checked={selectedCategory === 'ristoratore'}
+              onChange={() => handleCategoryChange('ristoratore')}
+            />
+          </Form.Group>
 
-              <input type="radio" className="btn-check" id="ristoratoreRadio" autoComplete="off" checked={selectedCategory === 'ristoratore'} onChange={() => handleCategoryChange('ristoratore')} />
-              <label className="btn btn-outline-primary" htmlFor="ristoratoreRadio">Ristoratore</label>
-            </div>
-          </div>
+          <Button variant="primary" onClick={handleRegister}>
+            Registrati
+          </Button>
 
-          <button type="button" className="btn btn-primary" onClick={handleRegister}>Registrati</button>
-        </form>
-        <p className="mt-3">Hai già un account? <Link to="/login">Accedi qui</Link></p>
-      </div>
-    </div>
+          {registrationSuccess && (
+            <Alert variant="success" className="mt-3">
+              Registrazione avvenuta con successo! Verrai reindirizzato alla pagina di login.
+            </Alert>
+          )}
+        </Form>
+
+        <p className="mt-3">
+          Hai già un account? <Link to="/login">Accedi qui</Link>
+        </p>
+      </Container>
+    </Container>
   );
 }

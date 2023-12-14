@@ -7,7 +7,7 @@ export default function Welcome() {
     <div className="background-container-welcome">
       <div className="container p-5">
         <h2 className="mb-4">Benvenuto!</h2>
-        <p>Scegli cosa vuoi fare:</p>
+        <p>Preparati per un esperienza mistica</p>
 
         <div className="d-flex flex-column">
           <Link to="/login" className="btn btn-primary mb-2">Accedi</Link>

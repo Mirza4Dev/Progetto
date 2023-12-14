@@ -29,6 +29,7 @@ app.get('/restaurants', async (req, res) => {
   res.status(200).json(restaurants);
 });
 
+
 app.get('/reservations', async (req, res) => {
   const reservations = await selectData('reservations');
   res.status(200).json(reservations);
@@ -57,7 +58,7 @@ app.post('/login', authenticateLogin, (req, res) => {
 });
 
 app.post('/restaurants', async (req, res) => {
-  const { restaurant_Id, name, description, photos, type, price, position } = req.body;
+  const { restaurant_Id, name, description, photos, type, price, position, menu } = req.body;
 
   const { cap, city, street } = position;
 
@@ -72,7 +73,8 @@ app.post('/restaurants', async (req, res) => {
       cap,
       city,
       street
-    }
+    },
+    menu
   });
   res.status(201).json({ message: 'Ristorante aggiunto con successo' });
 });

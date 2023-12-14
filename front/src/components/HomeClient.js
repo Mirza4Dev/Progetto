@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Nav, NavDropdown, Form, FormControl, Button, Card, Modal } from 'react-bootstrap';
-import Restaurant from './Restaurant';
+import { useNavigate, Link } from 'react-router-dom';
+import { Nav, NavDropdown, Form, FormControl, Card, Modal } from 'react-bootstrap';
+import Details from './Details';
 import EditReservation from './EditReservation';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function HomeClient() {
+  const [user, setUser] = useState(null);
   const [restaurants, setRestaurants] = useState([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-  const [user, setUser] = useState(null);
   const [myReservations, setMyReservations] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedReservationForEdit, setSelectedReservationForEdit] = useState(null);
@@ -23,16 +22,16 @@ export default function HomeClient() {
   }, []);
 
   useEffect(() => {
-    async function fetchRestaurants() {
-      const response = await fetch('http://localhost:3000/restaurants');
-      const data = await response.json();
+    async function restaurants() {
+      const res = await fetch('http://localhost:3000/restaurants');
+      const data = await res.json();
       setRestaurants(data);
     }
-    fetchRestaurants();
+    restaurants();
   }, []);
 
   useEffect(() => {
-    async function fetchUserReservations() {
+    async function userReservations() {
       const response = await fetch(`http://localhost:3000/reservations/user/${user._id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -42,7 +41,7 @@ export default function HomeClient() {
       setMyReservations(data);
     }
     if (user) {
-      fetchUserReservations();
+      userReservations();
     }
   }, [user, showEditModal]);
 
@@ -79,8 +78,9 @@ export default function HomeClient() {
   }
 
   const filteredRestaurants = restaurants.filter((restaurant) =>
-    restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    restaurant.type.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className="background-container-client">
@@ -100,8 +100,8 @@ export default function HomeClient() {
 
         </div>
 
-
-        <NavDropdown title="Le mie prenotazioni" id="basic-nav-dropdown">
+        {/* Prenotazioni */}
+        <NavDropdown title="Le mie prenotazioni" id="basic-nav-dropdown" className={`${user ? 'clickable' : 'unclickable'}`}>
           <NavDropdown.ItemText className="dropdown-menu-scrollable">
             <h2 className="mb-4">Prenotazioni</h2>
             <ul className="list-group overflow-auto">
@@ -115,6 +115,7 @@ export default function HomeClient() {
                       <p className="mb-1"><strong>Ora:</strong> {reservation.time}</p>
                       <p><strong>Ospiti:</strong> {reservation.guests}</p>
                     </div>
+
                     <div className="mt-auto d-flex align-items-center">
                       <button
                         className="btn btn-danger me-2"
@@ -132,23 +133,47 @@ export default function HomeClient() {
                   </li>
                 ))}
             </ul>
+
+            {/* Componente EditReservation */}
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Modifica Prenotazione</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <EditReservation reservation={selectedReservationForEdit} setShowEditModal={setShowEditModal} />
+              </Modal.Body>
+            </Modal>
+
           </NavDropdown.ItemText>
         </NavDropdown>
-        <ul className="navbar-nav" style={{ marginRight: '15px' }}>
-          <li className="nav-item">
-            <a className="nav-link" href="/profile">Il Mio Profilo</a>
-          </li>
-          <li className="nav-item ml-2">
-            <button className="btn btn-primary" onClick={handleLogout}>Logout</button>
-          </li>
-        </ul>
+
+        <NavDropdown title="Il Mio Profilo" id="basic-nav-dropdown" >
+          {user ? (
+            <>
+              <NavDropdown.Item>
+                <Link className="nav-link" to="/profile">Visualizza Profilo </Link>
+              </NavDropdown.Item>
+              <NavDropdown.Item >
+                <button className="btn btn-primary ms-3" onClick={handleLogout}>Logout</button>
+              </NavDropdown.Item>
+            </>
+          ) : (
+            <NavDropdown.Item>
+              <Link to="/login" className="btn btn-primary ms-3">Login</Link>
+            </NavDropdown.Item>
+          )}
+        </NavDropdown>
+
       </Nav>
+
+
 
       <div className="container mt-3 ">
         <div className="row main ">
           {/* Visualizzazione dei Ristoranti */}
           <div className="col-md-6">
             <h2 className="mb-2">Scegli il Ristorante da inForkettare</h2>
+
             <Form className="form-inline d-flex align-items-center mb-4 me-3">
               <FormControl
                 type="search"
@@ -158,53 +183,46 @@ export default function HomeClient() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <Button variant="outline-success" type="submit">
-                Cerca
-              </Button>
             </Form>
 
-            <div className="row row-cols-1 g-3 overflow-auto three-columns-grid" style={{ maxHeight: "500px" }}>
+            <div className="row row-cols-1 g-3 overflow-auto three-columns-grid" style={{ maxHeight: "610px" }}>
               {filteredRestaurants.map((restaurant) => (
                 <div key={restaurant._id} className="col mb-3">
-                  <Card className={`restaurant-card ${selectedRestaurant === restaurant ? 'selected' : 'hover'}`} onClick={() => setSelectedRestaurant(restaurant)}>
+                  <Card
+                    className={`restaurant-card ${selectedRestaurant === restaurant ? 'selected' : 'hover'}`}
+                    onClick={() => setSelectedRestaurant(restaurant)}
+                  >
                     <Card.Img className='imgCard' variant="top" src={restaurant.photos[0]} />
                     <Card.Body >
                       <Card.Title>{restaurant.name}</Card.Title>
                       <Card.Text>{restaurant.type}</Card.Text>
                       <Card.Text>{restaurant.position.city}</Card.Text>
-                      <Card.Text>Prezzo medio: ${restaurant.price}</Card.Text>
+                      <Card.Text>Prezzo medio {restaurant.price}€</Card.Text>
                     </Card.Body>
                   </Card>
                 </div>
               ))}
             </div>
-
           </div>
 
-          {/* Sezione per la visualizzazione del Restaurant */}
-          <div className="col d-flex align-items-center justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '30px', borderRadius: '10px', marginTop: '50px', marginRight: '30px' }}>
+          {/* Componente Details */}
+          <div className="col d-flex justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '15px', borderRadius: '10px', marginTop: '50px', marginRight: '30px', height: '650px' }}>
             {!selectedRestaurant && (
-              <div className="text-center">
-                <p className="text-center lead mt-3 text-white">InForketta il ristorante e goditi una bella mangiata</p>
+              <div className="text-center mt-5">
+                <img src={require('../img/logo.png')} alt="Forketta Logo" width="100" className="d-inline-block align-top" />
+                <p className="lead mt-3 text-white">InForketta il ristorante e goditi una bella mangiata</p>
               </div>
             )}
             {selectedRestaurant && (
               <div>
-                <Restaurant selectedRestaurant={selectedRestaurant} user={user} setMyReservations={setMyReservations} myReservations={myReservations} />
+                <Details selectedRestaurant={selectedRestaurant} user={user} setMyReservations={setMyReservations} myReservations={myReservations} />
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modifica Prenotazione</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <EditReservation reservation={selectedReservationForEdit} setShowEditModal={setShowEditModal} />
-        </Modal.Body>
-      </Modal>
+
     </div>
   );
 }

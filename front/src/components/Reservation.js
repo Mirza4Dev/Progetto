@@ -22,30 +22,23 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
       guests,
     };
 
-    try {
-      const response = await fetch(`http://localhost:3000/restaurants/${selectedRestaurant._id}/reservations`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(reservation),
-      });
+    await fetch(`http://localhost:3000/restaurants/${selectedRestaurant._id}/reservations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(reservation),
+    });
 
-      if (!response.ok) {
-        throw new Error('Errore durante la prenotazione');
-      }
 
-      const newReservations = [...myReservations, reservation];
 
-      // Aggiorna lo stato delle prenotazioni
-      setMyReservations(newReservations);
-      setShowReservationModal();
-      alert('Prenotazione aggiunta');
-    } catch (error) {
-      console.error('Errore durante la prenotazione:', error);
-      alert('Errore durante la prenotazione. Si prega di riprovare.');
-    }
+    const newReservations = [...myReservations, reservation];
+
+    setMyReservations(newReservations);
+    setShowReservationModal();
+    alert('Prenotazione aggiunta');
+
   };
 
   return (

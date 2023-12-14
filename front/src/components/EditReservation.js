@@ -40,7 +40,6 @@ export default function EditReservation({ reservation, setShowEditModal }) {
         <Modal.Title>Modifica Prenotazione</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {/* Contenuto della finestra modale */}
         <Form>
           <Form.Group controlId="newDay">
             <Form.Label>Nuovo Giorno:</Form.Label>
