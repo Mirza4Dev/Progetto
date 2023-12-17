@@ -20,7 +20,7 @@ export default function Details({ selectedRestaurant, user, setMyReservations, m
     async function fetchRestaurantReviews() {
       const res = await fetch(`http://localhost:3000/reviews/${selectedRestaurant._id}`)
       const fetchedReviews = await res.json()
-      setReviews(fetchedReviews)
+      setReviews(fetchedReviews.reverse())
     }
     fetchRestaurantReviews()
   }, [selectedRestaurant, showEditReviewModal, showReviewForm])
@@ -124,49 +124,46 @@ export default function Details({ selectedRestaurant, user, setMyReservations, m
               <h4 className='text-center'>Scrivi la prima recensione</h4>
             ) : (
               <div className="scrollbar-dim">
-                {reviews
-                  .sort((a, b) => new Date(b.date) - new Date(a.date))
-                  .map((review) => (
-                    <div className="card mb-3">
+                {reviews.map((review) => (
+                  <div className="card mb-3">
+                    <div className="card-body">
 
-                      <div className="card-body">
+                      {user && showEditReviewModal && editingReviewId === review._id ? (
+                        <Modal show={() => setShowEditReviewModal(true)} onHide={() => setShowEditReviewModal(false)} size="lg">
+                          <Modal.Header closeButton>
+                            <Modal.Title>Modifica Recensione</Modal.Title>
+                          </Modal.Header>
+                          <Modal.Body>
+                            <EditReview
+                              reviewId={editingReviewId}
+                              currentText={currentText}
+                              setEditingReviewId={setEditingReviewId}
+                              setShowEditReviewModal={setShowEditReviewModal}
+                            />
+                          </Modal.Body>
+                        </Modal>
+                      ) : (
+                        <div className="d-flex justify-content-between align-items-center">
+                          <p className='card-title'>
+                            <strong>{review.userName} il {review.date}<br /> Valutazione: {review.rating}/5</strong>
+                          </p>
+                          {user && review.user_Id === user._id && (
+                            <div className="d-flex">
+                              <Button variant="primary" onClick={() => hanldeEditReview(review._id)}>
+                                Modifica
+                              </Button>
+                              <Button variant="danger" className="me-1 ms-2" onClick={() => deleteReview(review._id)}>
+                                Elimina
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-                        {user && showEditReviewModal && editingReviewId === review._id ? (
-                          <Modal show={() => setShowEditReviewModal(true)} onHide={() => setShowEditReviewModal(false)} size="lg">
-                            <Modal.Header closeButton>
-                              <Modal.Title>Modifica Recensione</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                              <EditReview
-                                reviewId={editingReviewId}
-                                currentText={currentText}
-                                setEditingReviewId={setEditingReviewId}
-                                setShowEditReviewModal={setShowEditReviewModal}
-                              />
-                            </Modal.Body>
-                          </Modal>
-                        ) : (
-                          <div className="d-flex justify-content-between align-items-center">
-                            <p className='card-title'>
-                              <strong>{review.userName} il {new Date(review.date).toLocaleDateString('it-IT')}<br /> Valutazione: {review.rating}/5</strong>
-                            </p>
-                            {user && review.user_Id === user._id && (
-                              <div className="d-flex">
-                                <Button variant="primary" onClick={() => hanldeEditReview(review._id)}>
-                                  Modifica
-                                </Button>
-                                <Button variant="danger" className="me-1 ms-2" onClick={() => deleteReview(review._id)}>
-                                  Elimina
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        <p className='card-text'>{review.text}</p>
-                      </div>
+                      <p className='card-text'>{review.text}</p>
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
             )}
 

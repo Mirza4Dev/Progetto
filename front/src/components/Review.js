@@ -16,7 +16,6 @@ export default function Review({
       user_Id: user._id,
       userName: user.name,
       text: reviewText,
-      date: new Date().toISOString(),
       rating: rating
     }
 

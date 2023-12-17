@@ -3,7 +3,6 @@ const app = express()
 require('dotenv').config()
 const { authenticateLogin, authenticateToken } = require('./persistance')
 const bcrypt = require('bcryptjs')
-
 const bodyparser = require('body-parser')
 app.use(bodyparser.json())
 const cors = require('cors')
@@ -68,15 +67,11 @@ app.post('/register', async (req, res) => {
   if (existingEmailUser[0] || existingNameUser[0]) {
 
     if (existingEmailUser[0]) {
-      console.log("1 if")
       return res.status(400).json({ error: 'Email già registrato' });
     } else {
-      console.log("else")
       return res.status(400).json({ error: 'Nome già registrato' });
     }
   }
-
-
 
   const hashedPassword = await bcrypt.hash(password, 10)
   const insertResult = await insertDocument('users', {
@@ -86,12 +81,8 @@ app.post('/register', async (req, res) => {
     category
   })
   if (insertResult) {
-    console.log("insert if")
-
     res.status(200).json({ message: 'Registrazione avvenuta con successo' })
   } else {
-    console.log("else")
-
     res.status(500).json({ error: 'Errore durante la registrazione dell\'utente' })
   }
 })
@@ -120,9 +111,6 @@ app.post('/restaurants', async (req, res) => {
 })
 
 
-
-
-
 app.post('/restaurants/:id/reservations', async (req, res) => {
   const id = req.params.id
   const reservation = req.body
@@ -144,13 +132,11 @@ app.post('/reviews', async (req, res) => {
     user_Id,
     userName,
     text,
-    date: new Date().toISOString(),
+    date: new Date().toLocaleDateString(),
     rating,
   }
-
   const result = await insertDocument('reviews', newReview)
-
-  if (result) {
+  if (result.acknowledged === true) {
     res.status(200).json({ message: 'Grazie per aver inserito la recensione' })
   } else {
     res.status(404).json({ error: true, msg: 'Id not found' })
