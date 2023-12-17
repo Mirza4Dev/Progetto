@@ -13,8 +13,8 @@ export default function Details({ selectedRestaurant, user, setMyReservations, m
   const [reviews, setReviews] = useState([])
   const [editingReviewId, setEditingReviewId] = useState(null)
 
-  const editingReview = reviews.find((r) => r._id === editingReviewId);
-  const currentText = editingReview ? editingReview.text : "";
+  const editingReview = reviews.find((r) => r._id === editingReviewId)
+  const currentText = editingReview ? editingReview.text : ""
 
   useEffect(() => {
     async function fetchRestaurantReviews() {
@@ -137,6 +137,7 @@ export default function Details({ selectedRestaurant, user, setMyReservations, m
                             <EditReview
                               reviewId={editingReviewId}
                               currentText={currentText}
+                              currentRating={review.rating}
                               setEditingReviewId={setEditingReviewId}
                               setShowEditReviewModal={setShowEditReviewModal}
                             />

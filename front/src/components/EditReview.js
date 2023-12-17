@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Form, Button } from 'react-bootstrap'
 
-export default function EditReview({ reviewId, currentText, setEditingReviewId, setShowEditReviewModal }) {
+export default function EditReview({ reviewId, currentText, currentRating, setEditingReviewId, setShowEditReviewModal }) {
   const [editedText, setEditedText] = useState(currentText)
-  const [editedRating, setEditedRating] = useState(1)
+  const [editedRating, setEditedRating] = useState(currentRating)
 
   async function handleEditReview() {
     const response = await fetch(`http://localhost:3000/reviews/${reviewId}`, {
@@ -43,5 +43,5 @@ export default function EditReview({ reviewId, currentText, setEditingReviewId, 
         Annulla
       </Button>
     </Form>
-  );
+  )
 }

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Container, Row, Col, Form, Button, InputGroup, FormControl, ListGroup } from 'react-bootstrap'
 
 export default function HomeRestaurant() {
   const [newRestaurant, setNewRestaurant] = useState({
@@ -14,189 +15,145 @@ export default function HomeRestaurant() {
       street: ''
     },
     menu: {}
-  });
-  const [newPhoto, setNewPhoto] = useState('');
-  const [dishName, setDishName] = useState('');
-  const [dishPrice, setDishPrice] = useState('');
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  })
+  const [newPhoto, setNewPhoto] = useState('')
+  const [dishName, setDishName] = useState('')
+  const [dishPrice, setDishPrice] = useState('')
+  const [user, setUser] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-  }, []);
+    const storedUser = JSON.parse(localStorage.getItem('user'))
+    setUser(storedUser)
+  }, [])
 
 
-  function handleNewRestaurantSubmit() {
-
+  async function handleNewRestaurantSubmit() {
     const restaurantData = {
       restaurant_Id: user._id,
       ...newRestaurant,
-    };
+    }
 
-    fetch('http://localhost:3000/restaurants', {
+    const response = await fetch('http://localhost:3000/restaurants', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(restaurantData),
     })
-      .then(response => {
-        if (response.status !== 201) {
-          throw new Error(`Errore durante l'inserimento del ristorante: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(() => {
-        setNewRestaurant((prevRestaurant) => ({
-          ...prevRestaurant,
-          name: '',
-          description: '',
-          photo: [],
-          type: '',
-          price: '',
-          position: {
-            cap: '',
-            city: '',
-            street: ''
-          },
-          menu: {}
-        }));
-        setDishName('');
-        setDishPrice('');
+    await response.json()
 
-        alert('Ristorante aggiunto con successo!');
-      })
-      .catch(error => {
-        console.error('Errore durante l\'inserimento del ristorante:', error.message);
-        alert('Errore durante l\'inserimento del ristorante. Si prega di riprovare.');
-      });
+    setNewRestaurant((prevRestaurant) => ({
+      ...prevRestaurant,
+      name: '',
+      description: '',
+      photos: [],
+      type: '',
+      price: '',
+      position: {
+        cap: '',
+        city: '',
+        street: '',
+      },
+      menu: {},
+    }))
+    setDishName('')
+    setDishPrice('')
+
+    alert('Ristorante aggiunto con successo!')
   }
 
   function handleLogout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
   }
 
   function addPhoto() {
-    if (newPhoto.trim()) {
-      setNewRestaurant((prevRestaurant) => ({
-        ...prevRestaurant,
-        photos: [...prevRestaurant.photos, newPhoto.trim()]
-      }));
-      setNewPhoto('');
+    const trimmedPhoto = newPhoto.trim()
+
+    if (trimmedPhoto) {
+      setNewRestaurant(() => ({
+        ...newRestaurant,
+        photos: [...newRestaurant.photos, trimmedPhoto],
+      }))
+      setNewPhoto('')
     }
   }
 
+
   return (
-    <div className="container mt-5">
-      <div className="row">
-        <div className="col-md-6">
+    <Container className="mt-5">
+      <Row>
+        <Col md={6}>
           <h2 className="mb-4">Aggiungi Ristorante</h2>
-          <form>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">Nome</label>
-              <input
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="name">Nome</Form.Label>
+              <Form.Control
                 type="text"
-                className="form-control"
                 id="name"
                 value={newRestaurant.name}
                 onChange={(e) => setNewRestaurant({ ...newRestaurant, name: e.target.value })}
               />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="description" className="form-label">Descrizione</label>
-              <textarea
-                className="form-control"
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="description">Descrizione</Form.Label>
+              <Form.Control
+                as="textarea"
                 id="description"
                 value={newRestaurant.description}
                 onChange={(e) => setNewRestaurant({ ...newRestaurant, description: e.target.value })}
               />
-            </div>
-
-          </form>
-        </div>
-      </div>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="type">Tipologia cucina</Form.Label>
+              <Form.Control
+                type="text"
+                id="type"
+                value={newRestaurant.type}
+                onChange={(e) => setNewRestaurant({ ...newRestaurant, type: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="price">Prezzo</Form.Label>
+              <Form.Control
+                type="text"
+                id="price"
+                value={newRestaurant.price}
+                onChange={(e) => setNewRestaurant({ ...newRestaurant, price: e.target.value })}
+              />
+            </Form.Group>
+          </Form>
+        </Col>
+      </Row>
       <div className="mb-3">
-        <label htmlFor="type" className="form-label">Tipologia cucina</label>
-        <input
-          type="text"
-          className="form-control"
-          id="type"
-          value={newRestaurant.type}
-          onChange={(e) => setNewRestaurant({ ...newRestaurant, type: e.target.value })}
-        />
+        <Form.Label htmlFor="newPhoto">Foto</Form.Label>
+        <InputGroup className="mb-3">
+          <FormControl
+            type="text"
+            id="newPhoto"
+            value={newPhoto}
+            onChange={(e) => setNewPhoto(e.target.value)}
+          />
+          <Button variant="secondary" onClick={addPhoto}>
+            Aggiungi Foto
+          </Button>
+        </InputGroup>
       </div>
-      <div className="mb-3">
-        <label htmlFor="price" className="form-label">Prezzo</label>
-        <input
-          type="text"
-          className="form-control"
-          id="price"
-          value={newRestaurant.price}
-          onChange={(e) => setNewRestaurant({ ...newRestaurant, price: e.target.value })}
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="newPhoto" className="form-label">Foto</label>
-        <input
-          type="text"
-          className="form-control"
-          id="newPhoto"
-          value={newPhoto}
-          onChange={(e) => setNewPhoto(e.target.value)}
-        />
-        <button type="button" className="btn btn-secondary mt-2" onClick={addPhoto}>
-          Aggiungi Foto
-        </button>
-      </div>
-
       <div className="mt-3">
         <h4>Lista Foto</h4>
-        <ul>
+        <ListGroup>
           {newRestaurant.photos.map((photo, index) => (
-            <li key={index}>{photo}</li>
+            <ListGroup.Item key={index}>{photo}</ListGroup.Item>
           ))}
-        </ul>
+        </ListGroup>
       </div>
 
       <div className="mb-3">
-        <label htmlFor="position" className="form-label">Posizione</label>
-        <div className="mb-3">
-          <label htmlFor="cap" className="form-label">CAP</label>
-          <input
-            type="text"
-            className="form-control"
-            id="cap"
-            value={newRestaurant.position.cap}
-            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, cap: e.target.value } })}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="city" className="form-label">Città</label>
-          <input
-            type="text"
-            className="form-control"
-            id="city"
-            value={newRestaurant.position.city}
-            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, city: e.target.value } })}
-          />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="street" className="form-label">Via</label>
-          <input
-            type="text"
-            className="form-control"
-            id="street"
-            value={newRestaurant.position.street}
-            onChange={(e) => setNewRestaurant({ ...newRestaurant, position: { ...newRestaurant.position, street: e.target.value } })}
-          />
-        </div>
-      </div>
-      <div className="mb-3">
-        <label htmlFor="dishName" className="form-label">Nome Piatto</label>
+        <label htmlFor="dishName" className="form-label">
+          Nome Piatto
+        </label>
         <input
           type="text"
           className="form-control"
@@ -206,7 +163,9 @@ export default function HomeRestaurant() {
         />
       </div>
       <div className="mb-3">
-        <label htmlFor="dishPrice" className="form-label">Prezzo</label>
+        <label htmlFor="dishPrice" className="form-label">
+          Prezzo
+        </label>
         <input
           type="text"
           className="form-control"
@@ -219,9 +178,10 @@ export default function HomeRestaurant() {
         <h4>Menu</h4>
         <ul>
           {Object.keys(newRestaurant.menu).map((dish) => (
-            <li key={dish}>{dish}: {newRestaurant.menu[dish]}</li>
+            <li key={dish}>
+              {dish}: {newRestaurant.menu[dish]}
+            </li>
           ))}
-
         </ul>
       </div>
 
@@ -232,16 +192,17 @@ export default function HomeRestaurant() {
           if (dishName && dishPrice) {
             setNewRestaurant((prevRestaurant) => ({
               ...prevRestaurant,
-              menu: { ...prevRestaurant.menu, [dishName]: dishPrice }
-            }));
-            setDishName('');
-            setDishPrice('');
+              menu: { ...prevRestaurant.menu, [dishName]: dishPrice },
+            }))
+            setDishName('')
+            setDishPrice('')
           }
         }}
       >
         Aggiungi Piatto
       </button>
-      <br /><br />
+      <br />
+      <br />
 
       <button type="button" className="btn btn-primary" onClick={handleNewRestaurantSubmit}>
         Aggiungi Ristorante
@@ -251,7 +212,7 @@ export default function HomeRestaurant() {
           Logout
         </button>
       </div>
-    </div>
-  );
-};
+    </Container >
+  )
+}
 
