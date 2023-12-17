@@ -62,14 +62,13 @@ app.post('/login', authenticateLogin, (req, res) => {
 app.post('/register', async (req, res) => {
   const { name, email, password, category } = req.body
 
-  const existingNameUser = await selectData('users', { name });
-  const existingEmailUser = await selectData('users', { email });
+  const existingNameUser = await selectData('users', { name })
+  const existingEmailUser = await selectData('users', { email })
   if (existingEmailUser[0] || existingNameUser[0]) {
-
     if (existingEmailUser[0]) {
-      return res.status(400).json({ error: 'Email già registrato' });
+      return res.status(400).json({ error: 'Email già registrato' })
     } else {
-      return res.status(400).json({ error: 'Nome già registrato' });
+      return res.status(400).json({ error: 'Nome già registrato' })
     }
   }
 

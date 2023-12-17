@@ -1,21 +1,21 @@
 const connection = require('./connection')
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb')
 
 async function updateData(colName, id, updatedData) {
-  const db = await connection();
-  const col = db.collection(colName);
+  const db = await connection()
+  const col = db.collection(colName)
   const updateResult = await col.updateOne(
     { _id: new ObjectId(id) },
     { $set: updatedData }
-  );
+  )
 
-  console.log('Updated documents =>', updateResult);
-  return updateResult;
+  console.log('Updated documents =>', updateResult)
+  return updateResult
 
 }
 
 
-module.exports = updateData;
+module.exports = updateData
 
 
 
@@ -30,11 +30,11 @@ module.exports = updateData;
 
 // async function updateData(colName, query, input) {
 //   let db = await connection()
-//   const col = db.collection(colName);
+//   const col = db.collection(colName)
 
 //   // Update the document into the specified collection        
-//   const updateResult = await col.updateOne(query, input);
-//   console.log('Updated documents =>', updateResult);
+//   const updateResult = await col.updateOne(query, input)
+//   console.log('Updated documents =>', updateResult)
 //   return updateResult
 // }
 
