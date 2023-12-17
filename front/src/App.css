@@ -91,6 +91,7 @@ p {
 .three-columns-grid {
   display: flex;
   flex-wrap: wrap;
+  max-height: 610px;
 }
 .three-columns-grid .col {
   flex: 0 0 33.33%;
@@ -102,25 +103,31 @@ p {
 .imgCard {
   height: 120px;
 }
-.scrollbar-review {
-  max-height: 170px;
+.scrollbar-dim {
+  max-height: 205px;
   overflow-y: auto;
-}
-.unclickable {
-  cursor: not-allowed;
-  opacity: 0.6;
+  border-radius: 30px;
+  padding-left: 15px;
 }
 
-.unclickable:hover {
-  background-color: initial;
+.details {
+  background-image: url("./img/nero.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 50px;
+  margin-right: 30px;
+  height: 700px;
 }
 
-.w-100 {
+.imgsRest {
   height: 170px;
+  width: 300px;
 }
 .restaurant-info {
   height: 340px;
 }
 .reviews-section {
-  height: 260px;
+  height: 300px;
 }

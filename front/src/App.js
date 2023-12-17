@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import RegisterPage from './components/RegisterPage';
 import LoginPage from './components/LoginPage';
-import Welcome from './components/Welcome';
 import HomeClient from './components/HomeClient';
 import HomeRestaurant from './components/HomeRestaurant';
 
@@ -13,7 +12,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Welcome />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home-client" element={<HomeClient />} />

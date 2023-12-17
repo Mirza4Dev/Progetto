@@ -1,34 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Nav, NavDropdown, Form, FormControl, Card, Modal } from 'react-bootstrap';
-import Details from './Details';
-import EditReservation from './EditReservation';
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { Navbar, Container, Dropdown, Button, Form, FormControl, Card, Modal } from 'react-bootstrap'
+import Details from './Details'
+import EditReservation from './EditReservation'
 
 
 export default function HomeClient() {
-  const [user, setUser] = useState(null);
-  const [restaurants, setRestaurants] = useState([]);
-  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-  const [myReservations, setMyReservations] = useState([]);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedReservationForEdit, setSelectedReservationForEdit] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [user, setUser] = useState(null)
+  const [restaurants, setRestaurants] = useState([])
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null)
+  const [myReservations, setMyReservations] = useState([])
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedReservationForEdit, setSelectedReservationForEdit] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(function () {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    setUser(storedUser);
-  }, []);
+    const storedUser = JSON.parse(localStorage.getItem('user'))
+    setUser(storedUser)
+  }, [])
 
   useEffect(() => {
     async function restaurants() {
-      const res = await fetch('http://localhost:3000/restaurants');
-      const data = await res.json();
-      setRestaurants(data);
+      const res = await fetch('http://localhost:3000/restaurants')
+      const data = await res.json()
+      setRestaurants(data)
     }
-    restaurants();
-  }, []);
+    restaurants()
+  }, [])
 
   useEffect(() => {
     async function userReservations() {
@@ -36,45 +36,38 @@ export default function HomeClient() {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-      });
-      const data = await response.json();
-      setMyReservations(data);
+      })
+      const data = await response.json()
+      setMyReservations(data)
     }
     if (user) {
-      userReservations();
+      userReservations()
     }
-  }, [user, showEditModal]);
+  }, [user, showEditModal])
 
   const handleEditReservation = (reservation) => {
-    setSelectedReservationForEdit(reservation);
-    setShowEditModal(true);
-  };
+    setSelectedReservationForEdit(reservation)
+    setShowEditModal(true)
+  }
 
   async function handleDeleteReservation(reservationId) {
     const response = await fetch(`http://localhost:3000/reservations/${reservationId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
-    });
+    })
 
     if (response.ok) {
-      setMyReservations(myReservations.filter(reservation => reservation._id !== reservationId));
-      alert('Prenotazione eliminata con successo!');
+      setMyReservations(myReservations.filter(reservation => reservation._id !== reservationId))
+      alert('Prenotazione eliminata con successo!')
     }
   }
 
-  function formatDate(dateString) {
-    const options = { day: 'numeric', month: 'numeric', year: 'numeric' };
-    const formattedDate = new Date(dateString).toLocaleDateString(undefined, options);
-    return formattedDate;
-  }
-
   function handleLogout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
   }
 
   const filteredRestaurants = restaurants.filter((restaurant) =>
@@ -84,87 +77,116 @@ export default function HomeClient() {
 
   return (
     <div className="background-container-client">
-      <Nav className="container navbar navbar-expand-lg ">
+      <Navbar className="container navbar navbar-expand-lg ">
+        <Container>
+          <Navbar.Brand href="/home-client" className="d-flex align-items-center ">
+            <img src={require('../img/logo.png')} alt="Forketta Logo" width="69" className="d-inline-block me-1" />
+            <h5 >In <br />Forketta <br />Mi</h5>
+          </Navbar.Brand>
+          <div className="navbar-collapse justify-content-center align-items-center" >
+            <p className=" fw-bold fs-2"><strong>Benvenuto {user ? user.name : ''}</strong></p>
 
-        <a className="navbar-brand d-flex align-items-center ms-3" href="/home-client">
-          <img src={require('../img/logo.png')} alt="Forketta Logo" width="60" className="d-inline-block align-top" />
-          <span className="ms-2">Forketta</span>
-        </a>
+          </div>
 
-        <div className="collapse navbar-collapse justify-content-center align-items-center" id="navbarNav">
-          <ul className="navbar-nav">
-            <li className="nav-item text-center">
-              <p className="nav-link fw-bold fs-4">Benvenuto {user ? user.name : ''}</p>
-            </li>
-          </ul>
 
-        </div>
 
-        {/* Prenotazioni */}
-        <NavDropdown title="Le mie prenotazioni" id="basic-nav-dropdown" className={`${user ? 'clickable' : 'unclickable'}`}>
-          <NavDropdown.ItemText className="dropdown-menu-scrollable">
-            <h2 className="mb-4">Prenotazioni</h2>
-            <ul className="list-group overflow-auto">
-              {myReservations
-                .sort((a, b) => new Date(a.day) - new Date(b.day))
-                .map((reservation) => (
-                  <li key={reservation._id} className="list-group-item mb-3 d-flex flex-column">
-                    <div>
-                      <p className="mb-1"><strong>Ristorante:</strong> {reservation.name}</p>
-                      <p className="mb-1 me-2"><strong>Giorno:</strong> {formatDate(reservation.day)}</p>
-                      <p className="mb-1"><strong>Ora:</strong> {reservation.time}</p>
-                      <p><strong>Ospiti:</strong> {reservation.guests}</p>
-                    </div>
 
-                    <div className="mt-auto d-flex align-items-center">
-                      <button
-                        className="btn btn-danger me-2"
-                        onClick={() => handleDeleteReservation(reservation._id)}
-                      >
-                        Elimina
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handleEditReservation(reservation)}
-                      >
-                        Modifica
-                      </button>
-                    </div>
-                  </li>
-                ))}
-            </ul>
+          {/* Prenotazioni */}
+          {user && (
+            <Dropdown>
+              <Dropdown.Toggle variant="primary" >
+                Le mie prenotazioni
+              </Dropdown.Toggle>
 
-            {/* Componente EditReservation */}
-            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-              <Modal.Header closeButton>
-                <Modal.Title>Modifica Prenotazione</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <EditReservation reservation={selectedReservationForEdit} setShowEditModal={setShowEditModal} />
-              </Modal.Body>
-            </Modal>
+              <Dropdown.Menu>
+                {myReservations.length === 0 ? (
+                  <h4 className='text-center'>Non ci sono prenotazioni</h4>
+                ) : (
+                  <div className="scrollbar-dim-pren ms-1 me-1">
+                    <h2 className="mb-2 text-center">Prenotazioni</h2>
+                    <ul className="list-group overflow-auto ">
+                      {myReservations
+                        .sort((a, b) => new Date(a.day) - new Date(b.day))
+                        .map((reservation) => (
+                          <li key={reservation._id} className="list-group-item mb-2 d-flex flex-column">
+                            <div>
+                              <p className="mb-1"><strong>Ristorante:</strong> {reservation.name}</p>
+                              <p className="mb-1 me-2"><strong>Giorno:</strong> {new Date(reservation.day).toLocaleDateString('it-IT')}</p>
+                              <p className="mb-1"><strong>Ora:</strong> {reservation.time}</p>
+                              <p><strong>Ospiti:</strong> {reservation.guests}</p>
+                            </div>
 
-          </NavDropdown.ItemText>
-        </NavDropdown>
+                            <div className="mt-auto d-flex align-items-center">
+                              <Button
+                                variant="danger"
+                                className="me-2"
+                                onClick={() => handleDeleteReservation(reservation._id)}
+                              >
+                                Elimina
+                              </Button>
+                              <Button
+                                variant="primary"
+                                onClick={() => handleEditReservation(reservation)}
+                              >
+                                Modifica
+                              </Button>
+                            </div>
+                          </li>
+                        ))}
+                    </ul>
 
-        <NavDropdown title="Il Mio Profilo" id="basic-nav-dropdown" >
-          {user ? (
-            <>
-              <NavDropdown.Item>
-                <Link className="nav-link" to="/profile">Visualizza Profilo </Link>
-              </NavDropdown.Item>
-              <NavDropdown.Item >
-                <button className="btn btn-primary ms-3" onClick={handleLogout}>Logout</button>
-              </NavDropdown.Item>
-            </>
-          ) : (
-            <NavDropdown.Item>
-              <Link to="/login" className="btn btn-primary ms-3">Login</Link>
-            </NavDropdown.Item>
+
+                    {/* Componente EditReservation */}
+                    <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                      <Modal.Header closeButton>
+                        <Modal.Title>Modifica prenotazione</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body >
+                        <EditReservation reservation={selectedReservationForEdit} setShowEditModal={setShowEditModal} />
+                      </Modal.Body>
+                    </Modal>
+                  </div>
+                )}
+              </Dropdown.Menu>
+            </Dropdown>
           )}
-        </NavDropdown>
 
-      </Nav>
+          {/* Il Mio Profilo */}
+          <Dropdown>
+            <Dropdown.Toggle variant="primary" className="ms-4 me-3">
+              Il Mio Profilo
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu >
+              {user ? (
+                <>
+                  <Dropdown.Item>
+                    <Button variant="primary" className="ms-4" onClick={handleLogout}>
+                      Logout
+                    </Button>
+                  </Dropdown.Item>
+                </>
+              ) : (
+                <>
+                  <Dropdown.Item>
+                    <Link to="/login" className="btn btn-primary ms-4">
+                      Accedi
+                    </Link>
+                  </Dropdown.Item>
+
+                  <Dropdown.Item>
+                    <Link to="/register" className="btn btn-primary ms-3">
+                      Registrati
+                    </Link>
+                  </Dropdown.Item>
+                </>
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+
+        </Container>
+
+      </Navbar>
 
 
 
@@ -185,7 +207,7 @@ export default function HomeClient() {
               />
             </Form>
 
-            <div className="row row-cols-1 g-3 overflow-auto three-columns-grid" style={{ maxHeight: "610px" }}>
+            <div className="row row-cols-1 g-3 overflow-auto three-columns-grid">
               {filteredRestaurants.map((restaurant) => (
                 <div key={restaurant._id} className="col mb-3">
                   <Card
@@ -206,7 +228,7 @@ export default function HomeClient() {
           </div>
 
           {/* Componente Details */}
-          <div className="col d-flex justify-content-center" style={{ backgroundImage: `url(${require('../img/nero.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center', padding: '15px', borderRadius: '10px', marginTop: '50px', marginRight: '30px', height: '650px' }}>
+          <div className="col d-flex justify-content-center details" >
             {!selectedRestaurant && (
               <div className="text-center mt-5">
                 <img src={require('../img/logo.png')} alt="Forketta Logo" width="100" className="d-inline-block align-top" />
@@ -224,5 +246,5 @@ export default function HomeClient() {
 
 
     </div>
-  );
+  )
 }

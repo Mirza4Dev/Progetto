@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { useState } from 'react'
+import { Form, Button } from 'react-bootstrap'
 
 
 const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservations, setShowReservationModal }) => {
-  const [day, setDay] = useState('');
-  const [time, setTime] = useState('');
-  const [guests, setGuests] = useState('');
+  const [day, setDay] = useState('')
+  const [time, setTime] = useState('')
+  const [guests, setGuests] = useState('')
 
   const onReservationSubmit = async () => {
     if (!day || !time || !guests) {
-      alert('Completa tutti i campi della prenotazione.');
-      return;
+      alert('Completa tutti i campi della prenotazione.')
+      return
     }
 
     const reservation = {
@@ -20,26 +20,25 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
       day,
       time,
       guests,
-    };
+    }
 
-    await fetch(`http://localhost:3000/restaurants/${selectedRestaurant._id}/reservations`, {
+    let res = await fetch(`http://localhost:3000/restaurants/${selectedRestaurant._id}/reservations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(reservation),
-    });
+    })
+
+    const newReservations = [...myReservations, reservation]
+    if (res.ok) {
+      setMyReservations(newReservations)
+      setShowReservationModal()
+      alert('Prenotazione aggiunta')
+    }
 
 
-
-    const newReservations = [...myReservations, reservation];
-
-    setMyReservations(newReservations);
-    setShowReservationModal();
-    alert('Prenotazione aggiunta');
-
-  };
+  }
 
   return (
     <div className="container mt-3">
@@ -49,7 +48,6 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
             <Form.Label htmlFor="day" className="mr-2">Giorno:</Form.Label>
             <Form.Control
               type="date"
-              id="day"
               value={day}
               onChange={(e) => setDay(e.target.value)}
             />
@@ -58,7 +56,6 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
             <Form.Label htmlFor="time" className="mr-2">Ora:</Form.Label>
             <Form.Control
               type="time"
-              id="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
             />
@@ -67,7 +64,6 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
             <Form.Label htmlFor="guests" className="mr-2">Ospiti:</Form.Label>
             <Form.Control
               type="number"
-              id="guests"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
             />
@@ -83,7 +79,7 @@ const Reservation = ({ selectedRestaurant, user, setMyReservations, myReservatio
         </Form>
       </div>
     </div>
-  );
+  )
 }
 
-export default Reservation;
+export default Reservation

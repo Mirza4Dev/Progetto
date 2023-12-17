@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { useState } from 'react'
+import { Form, Button } from 'react-bootstrap'
 
 export default function Review({
   selectedRestaurant,
   user,
-  closeReviewForm
+  setShowReviewForm
 }) {
-  const [reviewText, setReviewText] = useState('');
-  const [rating, setRating] = useState(1);
+  const [reviewText, setReviewText] = useState('')
+  const [rating, setRating] = useState(1)
 
 
   async function handleReviewSubmit() {
@@ -18,21 +18,21 @@ export default function Review({
       text: reviewText,
       date: new Date().toISOString(),
       rating: rating
-    };
+    }
 
     const response = await fetch('http://localhost:3000/reviews', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(newReview),
-    });
+    })
 
     if (response.ok) {
-      closeReviewForm()
+      setShowReviewForm(false)
+      alert('Recensione inviata con successo!')
     } else {
-      console.error('Errore durante l\'invio della recensione:', response.statusText);
+      console.error('Errore durante l\'invio della recensione:', response.statusText)
     }
   }
 
@@ -52,5 +52,5 @@ export default function Review({
         Invia Recensione
       </Button>
     </Form>
-  );
+  )
 }

@@ -6,7 +6,6 @@ async function insertDocument(colName, input) {
 
   // Insert the document into the specified collection        
   const doc = await col.insertOne(input);
-  console.log(doc)
   return doc
 }
 

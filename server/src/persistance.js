@@ -1,25 +1,44 @@
-// authMiddleware.js
-const jwt = require('jsonwebtoken');
 const selectData = require('./select-data');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs')
+
 
 const authenticateLogin = async (req, res, next) => {
   const { email, password, selectedCategory } = req.body;
 
-  const users = await selectData('utenti', { email });
+  const user = await selectData('users', { email });
 
-
-  const user = users.find(u => u.email === email && u.password === password && u.category === selectedCategory);
-
-  if (!user) {
-    return res.status(403).json({ message: 'Credenziali non valide' });
+  const userMatch = user.find(u => u.email === email && u.category === selectedCategory);
+  if (userMatch) {
+    const passwordMatch = await bcrypt.compare(password, userMatch.password)
+    if (!userMatch || !passwordMatch) {
+      return res.status(401).json({ message: 'Credenziali non valide' });
+    }
+    const token = jwt.sign({ userId: userMatch._id }, process.env.JWT_SECRET);
+    req.token = token;
+    req.currentUser = userMatch;
   }
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
-  req.currentUser = user;
-  req.token = token;
 
   next();
 };
 
-module.exports = { authenticateLogin };
+
+const authenticateToken = (req, res, next) => {
+  const authorization = req.header('Authorization');
+  const token = authorization.slice(7)
+  if (!token) {
+    return res.status(401).json({ error: 'Accesso non autorizzato. Token mancante.' });
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = decoded;
+  next();
+
+};
+
+
+module.exports = { authenticateLogin, authenticateToken };
+
+
